@@ -9,10 +9,10 @@ import { successResponse, errorResponse, paginatedResponse } from "@/lib/respons
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const { productId } = params;
+    const { productId } = await params;
 
     // Validate productId format
     if (!productId || productId.length < 20) {

@@ -11,10 +11,10 @@ import { AppError } from "@/lib/errors";
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
-    const { productId } = params;
+    const { productId } = await params;
 
     // Verify authentication
     const authHeader = req.headers.get("authorization");

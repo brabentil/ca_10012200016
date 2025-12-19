@@ -17,7 +17,7 @@ import {
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = request.headers.get('x-user-id');
@@ -26,7 +26,7 @@ export async function PATCH(
       return errorResponse('UNAUTHORIZED', 'Authentication required', 401);
     }
 
-    const { id: cartItemId } = params;
+    const { id: cartItemId } = await params;
     const body = await request.json();
 
     // Validate request body
@@ -114,7 +114,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = request.headers.get('x-user-id');
@@ -123,7 +123,7 @@ export async function DELETE(
       return errorResponse('UNAUTHORIZED', 'Authentication required', 401);
     }
 
-    const { id: cartItemId } = params;
+    const { id: cartItemId } = await params;
 
     // Find cart item
     const cartItem = await prisma.cartItem.findUnique({

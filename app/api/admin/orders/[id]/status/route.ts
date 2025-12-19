@@ -15,7 +15,7 @@ import {
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userRole = request.headers.get('x-user-role');
@@ -24,7 +24,7 @@ export async function PATCH(
       return errorResponse('FORBIDDEN', 'Admin access required', 403);
     }
 
-    const { id: orderId } = params;
+    const { id: orderId } = await params;
     const body = await request.json();
 
     // Validate request body

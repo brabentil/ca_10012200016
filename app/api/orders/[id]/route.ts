@@ -14,7 +14,7 @@ import {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = request.headers.get('x-user-id');
@@ -24,7 +24,7 @@ export async function GET(
       return errorResponse('UNAUTHORIZED', 'Authentication required', 401);
     }
 
-    const { id: orderId } = params;
+    const { id: orderId } = await params;
 
     // Fetch order with all relations
     const order = await prisma.order.findUnique({
