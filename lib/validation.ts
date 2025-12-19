@@ -126,15 +126,6 @@ export const paydayFlexSchema = z.object({
 });
 
 /**
- * Review Schema
- */
-export const createReviewSchema = z.object({
-  productId: z.string().uuid('Invalid product ID'),
-  rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
-  comment: z.string().optional(),
-});
-
-/**
  * Update Order Status Schema
  */
 export const updateOrderStatusSchema = z.object({
