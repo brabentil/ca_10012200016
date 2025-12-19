@@ -8,16 +8,10 @@ import {
   internalServerErrorResponse,
 } from '@/lib/response';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
 /**
  * DELETE /api/upload/product-image/[id] - Delete product image
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userRole = request.headers.get('x-user-role');
 
@@ -25,7 +19,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return forbiddenErrorResponse('Admin access required');
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Find image
     const productImage = await prisma.productImage.findUnique({
