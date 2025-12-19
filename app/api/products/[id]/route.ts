@@ -9,18 +9,12 @@ import {
   internalServerErrorResponse,
 } from '@/lib/response';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
 /**
  * GET /api/products/[id] - Get single product details
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const product = await prisma.product.findUnique({
       where: { id },
@@ -72,7 +66,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 /**
  * PATCH /api/products/[id] - Update product (Admin only)
  */
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userRole = request.headers.get('x-user-role');
 
@@ -80,7 +74,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return forbiddenErrorResponse('Admin access required');
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Check if product exists
     const existingProduct = await prisma.product.findUnique({
@@ -122,7 +116,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 /**
  * DELETE /api/products/[id] - Soft delete product (Admin only)
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userRole = request.headers.get('x-user-role');
 
@@ -130,7 +124,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return forbiddenErrorResponse('Admin access required');
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Check if product exists
     const existingProduct = await prisma.product.findUnique({
