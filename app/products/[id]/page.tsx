@@ -85,7 +85,7 @@ export default function ProductDetailPage() {
         const product = response.data.data;
         
         // Transform backend response to match frontend Product interface
-        const transformedProduct = {
+        const transformedProduct: Product = {
           product_id: product.id,
           name: product.title,
           description: product.description,
@@ -102,8 +102,8 @@ export default function ProductDetailPage() {
           size: product.size,
           color: product.color,
           brand: product.brand,
-          reviewCount: product.reviewCount,
-          averageRating: product.averageRating
+          average_rating: product.averageRating,
+          total_reviews: product.reviewCount
         };
         
         setProduct(transformedProduct);
