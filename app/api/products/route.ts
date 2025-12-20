@@ -36,7 +36,8 @@ export async function GET(request: NextRequest) {
     };
 
     if (category) {
-      where.category = category;
+      // Convert category to uppercase to match ProductCategory enum
+      where.category = category.toUpperCase().replace(/\s+/g, '_');
     }
 
     if (minPrice || maxPrice) {
@@ -57,7 +58,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (condition) {
-      where.condition = condition;
+      // Convert condition to match ProductCondition enum format
+      where.condition = condition.toUpperCase().replace(/\s+/g, '_');
     }
 
     if (search) {

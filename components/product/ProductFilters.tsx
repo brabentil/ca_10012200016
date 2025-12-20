@@ -11,7 +11,7 @@ interface FilterOptions {
   categories?: string[];
   sizes?: string[];
   colors?: string[];
-  conditions?: ('Like New' | 'Good' | 'Fair' | 'Worn')[];
+  conditions?: ('Like New' | 'Good' | 'Fair' | 'Vintage')[];
   minPrice?: number;
   maxPrice?: number;
 }
@@ -33,10 +33,10 @@ export interface ActiveFilters {
 }
 
 const defaultOptions: FilterOptions = {
-  categories: ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Bags'],
+  categories: ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories'],
   sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
   colors: ['Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Pink', 'Brown', 'Gray', 'Beige'],
-  conditions: ['Like New', 'Good', 'Fair', 'Worn'],
+  conditions: ['Like New', 'Good', 'Fair', 'Vintage'],
   minPrice: 0,
   maxPrice: 500,
 };
@@ -121,7 +121,7 @@ export default function ProductFilters({
     'Like New': 'bg-green-500',
     'Good': 'bg-blue-500',
     'Fair': 'bg-yellow-500',
-    'Worn': 'bg-orange-500',
+    'Vintage': 'bg-orange-500',
   };
 
   return (
@@ -129,50 +129,26 @@ export default function ProductFilters({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-xl border-2 border-gray-100 overflow-hidden"
+      className="space-y-4"
     >
-      {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-primary-50 to-primary-100 border-b-2 border-gray-100">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
-              <SlidersHorizontal className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">Filters</h3>
-              {activeFilterCount > 0 && (
-                <p className="text-xs text-gray-600">{activeFilterCount} active</p>
-              )}
-            </div>
-          </div>
-          <button
-            onClick={handleToggle}
-            className="text-gray-600 hover:text-gray-900 transition-colors"
+      {/* Clear Filters Button */}
+      {activeFilterCount > 0 && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <Button
+            onClick={clearFilters}
+            variant="outline"
+            size="sm"
+            className="w-full h-9 border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all"
           >
-            {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          </button>
-        </div>
-
-        {/* Clear Filters Button */}
-        {activeFilterCount > 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-3"
-          >
-            <Button
-              onClick={clearFilters}
-              variant="outline"
-              size="sm"
-              className="w-full h-9 border-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all"
-            >
-              <X className="w-4 h-4 mr-2" />
-              Clear all filters
-            </Button>
-          </motion.div>
-        )}
-      </div>
+            <X className="w-4 h-4 mr-2" />
+            Clear all filters
+          </Button>
+        </motion.div>
+      )}
 
       {/* Filters Content */}
       <AnimatePresence>
@@ -184,7 +160,7 @@ export default function ProductFilters({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="p-4 space-y-4">
+            <div className="space-y-4">
               {/* Category Filter */}
               {options.categories && options.categories.length > 0 && (
                 <div className="border-b border-gray-100 pb-4">

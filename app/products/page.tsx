@@ -129,7 +129,7 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b-2 border-gray-200">
+      <div className="bg-white border-b border-gray-300 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -156,7 +156,7 @@ export default function ProductsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products..."
-                className="w-full h-12 pl-12 pr-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 transition-colors"
+                className="w-full h-12 pl-12 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               {searchQuery && (
@@ -183,7 +183,7 @@ export default function ProductsPage() {
           >
             <Button
               onClick={() => setFiltersOpen(true)}
-              className="w-full h-12 bg-primary-600 hover:bg-primary-700 text-white font-semibold border-2 border-primary-600 rounded-xl transition-all"
+              className="w-full h-12 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-all"
             >
               <SlidersHorizontal className="w-5 h-5 mr-2" />
               Filters
@@ -205,24 +205,34 @@ export default function ProductsPage() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="hidden lg:block w-80 flex-shrink-0"
+            className="hidden lg:block w-72 flex-shrink-0"
           >
             <div className="sticky top-8">
-              <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Filters</h2>
-                  {activeFilterCount > 0 && (
-                    <button
-                      onClick={clearFilters}
-                      className="text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
-                    >
-                      Clear All
-                    </button>
-                  )}
+              <div className="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+                {/* Filters Header with Blue Background */}
+                <div className="bg-primary-600 text-white p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <SlidersHorizontal className="w-5 h-5" />
+                      <h2 className="text-lg font-bold">Filters</h2>
+                    </div>
+                    {activeFilterCount > 0 && (
+                      <button
+                        onClick={clearFilters}
+                        className="text-sm font-semibold hover:underline"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <ProductFilters
-                  onFilterChange={handleFiltersChange}
-                />
+                
+                {/* Filters Content */}
+                <div className="p-4">
+                  <ProductFilters
+                    onFilterChange={handleFiltersChange}
+                  />
+                </div>
               </div>
             </div>
           </motion.aside>
@@ -242,7 +252,7 @@ export default function ProductsPage() {
                   return (
                     <div
                       key={key}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 border-2 border-primary-200 rounded-lg text-sm font-semibold text-primary-700"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 border border-primary-200 rounded-md text-sm font-medium text-primary-700"
                     >
                       <span className="capitalize">{key}: {value}</span>
                       <button
@@ -253,7 +263,7 @@ export default function ProductsPage() {
                         }}
                         className="hover:text-primary-900 transition-colors"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   );
@@ -267,7 +277,7 @@ export default function ProductsPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white border-2 border-gray-200 rounded-xl p-12 text-center"
+                className="bg-white border border-gray-300 rounded-lg shadow-sm p-12 text-center"
               >
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Package className="w-10 h-10 text-gray-400" />
@@ -279,7 +289,7 @@ export default function ProductsPage() {
                 {activeFilterCount > 0 && (
                   <Button
                     onClick={clearFilters}
-                    className="bg-primary-600 hover:bg-primary-700 text-white font-semibold border-2 border-primary-600 rounded-lg px-6 py-2"
+                    className="bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg px-6 py-2"
                   >
                     Clear All Filters
                   </Button>
@@ -300,7 +310,7 @@ export default function ProductsPage() {
                 <Button
                   onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  className="h-10 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="h-10 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </Button>
@@ -323,10 +333,10 @@ export default function ProductsPage() {
                       <button
                         key={pageNum}
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`h-10 w-10 font-semibold border-2 rounded-lg transition-all ${
+                        className={`h-10 w-10 font-semibold border rounded-lg transition-all ${
                           currentPage === pageNum
                             ? 'bg-primary-600 text-white border-primary-600'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-primary-500 hover:text-primary-600'
                         }`}
                       >
                         {pageNum}
@@ -338,7 +348,7 @@ export default function ProductsPage() {
                 <Button
                   onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
-                  className="h-10 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="h-10 px-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </Button>

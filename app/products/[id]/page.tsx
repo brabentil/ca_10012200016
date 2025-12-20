@@ -216,242 +216,183 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumbs */}
-      <div className="bg-white border-b-2 border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="bg-white border-b border-gray-300">
+        <div className="max-w-screen-xl mx-auto px-4 py-3">
           <motion.nav
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-sm"
+            className="flex items-center gap-2 text-xs text-gray-600"
           >
-            <Link href="/" className="text-gray-600 hover:text-primary-600 transition-colors">
+            <Link href="/" className="hover:text-primary-600 hover:underline">
               Home
             </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <Link href="/products" className="text-gray-600 hover:text-primary-600 transition-colors">
+            <ChevronRight className="w-3 h-3" />
+            <Link href="/products" className="hover:text-primary-600 hover:underline">
               Products
             </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <Link href={`/products?category=${product.category}`} className="text-gray-600 hover:text-primary-600 transition-colors">
+            <ChevronRight className="w-3 h-3" />
+            <Link href={`/products?category=${product.category}`} className="hover:text-primary-600 hover:underline">
               {product.category}
             </Link>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-900 font-semibold truncate">{product.name}</span>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-gray-900">{product.name}</span>
           </motion.nav>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+      <div className="max-w-screen-xl mx-auto px-4 py-6">
+        <div className="w-full grid md:grid-cols-3 gap-4 bg-gray-100 rounded-lg overflow-hidden">
           {/* Left Column - Images */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
+            className="flex items-center justify-center bg-gray-200 rounded-lg relative group"
           >
             <ProductImageGallery images={product.images} productName={product.name} />
+            
+            {/* Hover Actions */}
+            <div className="w-12 h-24 absolute bottom-10 right-0 border border-gray-400 bg-white rounded-md flex flex-col translate-x-20 group-hover:-translate-x-2 transition-transform duration-300">
+              <button
+                onClick={handleAddToCart}
+                disabled={!product.is_available}
+                className="w-full h-full border-b border-gray-400 flex items-center justify-center text-xl bg-transparent hover:bg-secondary-500 hover:text-white cursor-pointer duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ShoppingCart className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleWishlistToggle}
+                className="w-full h-full flex items-center justify-center text-xl bg-transparent hover:bg-secondary-500 hover:text-white cursor-pointer duration-300"
+              >
+                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-600 text-red-600' : ''}`} />
+              </button>
+            </div>
           </motion.div>
 
-          {/* Right Column - Product Info */}
+          {/* Right Column - Product Info (spans 2 columns) */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="space-y-6"
+            className="md:col-span-2 flex flex-col gap-3 justify-center p-6 bg-white"
           >
-            {/* Title & Price */}
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{product.name}</h1>
-              <div className="flex items-center gap-4 mb-4">
-                {product.average_rating && (
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-5 h-5 ${
-                            i < Math.floor(product.average_rating!)
-                              ? 'fill-secondary-500 text-secondary-500'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm font-semibold text-gray-700">
-                      {product.average_rating.toFixed(1)} ({product.total_reviews} reviews)
-                    </span>
-                  </div>
-                )}
+            {/* Category & Brand */}
+            <p className="text-xs md:text-sm text-primary-600 font-semibold">
+              {product.category}{product.brand && `_${product.brand}`}
+            </p>
+            
+            {/* Title */}
+            <h1 className="text-xl md:text-3xl tracking-wide font-semibold text-gray-900">
+              {product.name}
+            </h1>
+            
+            {/* Rating */}
+            {product.average_rating && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${
+                        i < Math.floor(product.average_rating!)
+                          ? 'fill-secondary-500 text-secondary-500'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-gray-600">({product.total_reviews})</span>
               </div>
-              <div className="text-4xl font-bold text-primary-600 mb-2">
-                {formatPrice(product.price)}
-              </div>
-              <p className="text-sm text-gray-600">
-                Listed on {formatDate(product.created_at)}
+            )}
+            
+            {/* Description */}
+            <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
+            
+            {/* Price Section */}
+            <div className="space-y-2">
+              <p className="text-base text-gray-600 flex items-center gap-2">
+                Price:
+                <span className="text-2xl text-primary-600 font-semibold">
+                  {formatPrice(product.price)}
+                </span>
               </p>
-            </div>
-
-            {/* Availability Status */}
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 ${
-              product.is_available
-                ? 'bg-green-50 border-green-200 text-green-700'
-                : 'bg-red-50 border-red-200 text-red-700'
-            }`}>
-              <Package className="w-5 h-5" />
-              <span className="font-semibold">
-                {product.is_available ? 'In Stock' : 'Out of Stock'}
-              </span>
-            </div>
-
-            {/* Quick Info */}
-            <div className="bg-white border-2 border-gray-200 rounded-xl p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {product.category && (
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Category</p>
-                    <p className="font-semibold text-gray-900">{product.category}</p>
-                  </div>
-                )}
+              
+              {/* Availability */}
+              <p className={`text-sm font-semibold ${
+                product.is_available ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {product.is_available ? '✓ In Stock' : '✗ Out of Stock'}
+              </p>
+              
+              {/* Product Details Grid */}
+              <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-200">
                 {product.size && (
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Size</p>
-                    <p className="font-semibold text-gray-900">{product.size}</p>
+                    <p className="text-xs text-gray-500">Size</p>
+                    <p className="text-sm font-medium text-gray-900">{product.size}</p>
                   </div>
                 )}
                 {product.color && (
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Color</p>
-                    <p className="font-semibold text-gray-900">{product.color}</p>
+                    <p className="text-xs text-gray-500">Color</p>
+                    <p className="text-sm font-medium text-gray-900">{product.color}</p>
                   </div>
                 )}
                 {product.brand && (
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Brand</p>
-                    <p className="font-semibold text-gray-900">{product.brand}</p>
+                    <p className="text-xs text-gray-500">Brand</p>
+                    <p className="text-sm font-medium text-gray-900">{product.brand}</p>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="space-y-3">
-              <Button
-                onClick={handleAddToCart}
-                disabled={!product.is_available}
-                className="w-full h-14 bg-secondary-500 hover:bg-secondary-600 text-white font-semibold text-lg border-2 border-secondary-500 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Add to Cart
-              </Button>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  onClick={handleWishlistToggle}
-                  className={`h-12 font-semibold border-2 rounded-xl transition-all ${
-                    isWishlisted
-                      ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Heart className={`w-5 h-5 mr-2 ${isWishlisted ? 'fill-red-600' : ''}`} />
-                  {isWishlisted ? 'Saved' : 'Save'}
-                </Button>
-
-                <Button
-                  onClick={handleShare}
-                  className="h-12 bg-white text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 rounded-xl transition-all"
-                >
-                  <Share2 className="w-5 h-5 mr-2" />
-                  Share
-                </Button>
-              </div>
-            </div>
-
-            {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-primary-50 border-2 border-primary-200 rounded-xl p-4 text-center">
-                <Truck className="w-6 h-6 text-primary-600 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-gray-900">Campus Delivery</p>
-                <p className="text-xs text-gray-600">Under 2 hours</p>
-              </div>
-              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
-                <Shield className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-gray-900">Secure Payment</p>
-                <p className="text-xs text-gray-600">Protected</p>
-              </div>
-              <div className="bg-secondary-50 border-2 border-secondary-200 rounded-xl p-4 text-center">
-                <Package className="w-6 h-6 text-secondary-600 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-gray-900">Quality Check</p>
-                <p className="text-xs text-gray-600">Verified</p>
-              </div>
-            </div>
-
-            {/* Seller Info */}
-            {product.seller && (
-              <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Seller Information</h3>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-primary-600">
-                        {product.seller.first_name[0]}{product.seller.last_name[0]}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900">
-                        {product.seller.first_name} {product.seller.last_name}
-                      </p>
-                      {product.seller.is_verified && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600">
-                          <Shield className="w-3 h-3" />
-                          Verified Student
-                        </span>
-                      )}
-                      {product.seller.total_sales && (
-                        <p className="text-sm text-gray-600">
-                          {product.seller.total_sales} sales
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => router.push(`/sellers/${product.seller_id}`)}
-                    className="bg-primary-50 text-primary-700 font-semibold border-2 border-primary-200 hover:bg-primary-100 rounded-lg px-4 py-2"
-                  >
-                    View Profile
-                  </Button>
+                <div>
+                  <p className="text-xs text-gray-500">Condition</p>
+                  <p className="text-sm font-medium text-gray-900">{product.condition}</p>
                 </div>
               </div>
-            )}
+              
+              {/* Add to Cart Button */}
+              <button
+                onClick={handleAddToCart}
+                disabled={!product.is_available}
+                className="w-full md:w-96 h-12 bg-secondary-500 text-white hover:bg-secondary-600 hover:text-white duration-300 rounded-lg mt-5 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                Add to cart
+              </button>
+              
+              {/* Additional Actions */}
+              <div className="flex gap-3 mt-3">
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary-600 transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </button>
+              </div>
+            </div>
+            
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-gray-200">
+              <div className="flex flex-col items-center text-center p-2">
+                <Truck className="w-5 h-5 text-primary-600 mb-1" />
+                <p className="text-xs font-medium text-gray-900">Campus Delivery</p>
+                <p className="text-xs text-gray-500">Under 2hrs</p>
+              </div>
+              <div className="flex flex-col items-center text-center p-2">
+                <Shield className="w-5 h-5 text-green-600 mb-1" />
+                <p className="text-xs font-medium text-gray-900">Verified</p>
+                <p className="text-xs text-gray-500">Quality Check</p>
+              </div>
+              <div className="flex flex-col items-center text-center p-2">
+                <Package className="w-5 h-5 text-secondary-600 mb-1" />
+                <p className="text-xs font-medium text-gray-900">Secure</p>
+                <p className="text-xs text-gray-500">Payment</p>
+              </div>
+            </div>
           </motion.div>
         </div>
-
-        {/* Product Details Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-12"
-        >
-          <ProductDetails
-            description={product.description}
-            category={product.category}
-            size={product.size}
-            color={product.color}
-            brand={product.brand}
-            material={product.material}
-            condition={product.condition}
-            measurements={product.measurements}
-            careInstructions={product.care_instructions}
-            additionalInfo={product.additional_info}
-            seller={product.seller ? {
-              name: `${product.seller.first_name} ${product.seller.last_name}`,
-              is_verified: product.seller.is_verified,
-              total_sales: product.seller.total_sales
-            } : undefined}
-            dateAdded={product.created_at}
-          />
-        </motion.div>
 
         {/* Similar Products */}
         {similarProducts.length > 0 && (
@@ -459,7 +400,7 @@ export default function ProductDetailPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-12"
+            className="mt-8"
           >
             <SimilarProducts
               products={similarProducts}
