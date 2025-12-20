@@ -75,9 +75,26 @@ export default function ProductsPage() {
       const response = await apiClient.get(`/products?${params.toString()}`);
       
       if (response.data.success) {
-        setProducts(response.data.data.products || []);
-        setTotalProducts(response.data.data.total || 0);
-        setTotalPages(Math.ceil((response.data.data.total || 0) / itemsPerPage));
+        // Transform backend response to match frontend Product interface
+        const transformedProducts = (response.data.data || []).map((product: any) => ({
+          product_id: product.id,
+          name: product.title,
+          price: parseFloat(product.price),
+          condition: product.condition === 'LIKE_NEW' ? 'Like New' : 
+                    product.condition === 'GOOD' ? 'Good' :
+                    product.condition === 'FAIR' ? 'Fair' :
+                    product.condition === 'VINTAGE' ? 'Good' : 'Good',
+          images: product.images?.map((img: any) => img.imageUrl) || [],
+          category: product.category,
+          seller_id: product.sellerId,
+          is_available: product.stock > 0,
+          average_rating: product.averageRating,
+          total_reviews: product.reviewCount,
+        }));
+        
+        setProducts(transformedProducts);
+        setTotalProducts(response.data.pagination?.total || 0);
+        setTotalPages(response.data.pagination?.pages || 1);
       }
     } catch (error: any) {
       console.error('Error fetching products:', error);

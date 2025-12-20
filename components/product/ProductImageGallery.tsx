@@ -17,8 +17,9 @@ export default function ProductImageGallery({ images, productName }: ProductImag
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
-  // Handle case where images array is empty
-  const displayImages = images.length > 0 ? images : ['/images/placeholder.jpg'];
+  // Handle case where images array is empty or contains invalid values
+  const validImages = images.filter(img => typeof img === 'string' && img.trim() !== '');
+  const displayImages = validImages.length > 0 ? validImages : ['/images/placeholder.jpg'];
   const selectedImage = displayImages[selectedIndex];
 
   // Minimum swipe distance (in px)

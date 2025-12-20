@@ -82,7 +82,31 @@ export default function ProductDetailPage() {
     try {
       const response = await apiClient.get(`/products/${productId}`);
       if (response.data.success) {
-        setProduct(response.data.data);
+        const product = response.data.data;
+        
+        // Transform backend response to match frontend Product interface
+        const transformedProduct = {
+          product_id: product.id,
+          name: product.title,
+          description: product.description,
+          price: parseFloat(product.price),
+          condition: product.condition === 'LIKE_NEW' ? 'Like New' : 
+                    product.condition === 'GOOD' ? 'Good' :
+                    product.condition === 'FAIR' ? 'Fair' :
+                    product.condition === 'VINTAGE' ? 'Good' : 'Good',
+          images: product.images?.map((img: any) => img.imageUrl) || [],
+          category: product.category,
+          seller_id: product.sellerId || 1,
+          is_available: product.stock > 0,
+          created_at: product.createdAt,
+          size: product.size,
+          color: product.color,
+          brand: product.brand,
+          reviewCount: product.reviewCount,
+          averageRating: product.averageRating
+        };
+        
+        setProduct(transformedProduct);
       }
     } catch (error: any) {
       console.error('Error fetching product:', error);
@@ -94,10 +118,12 @@ export default function ProductDetailPage() {
 
   const fetchSimilarProducts = async () => {
     try {
-      const response = await apiClient.get(`/products/${productId}/similar`);
-      if (response.data.success) {
-        setSimilarProducts(response.data.data || []);
-      }
+      // TODO: Create /api/products/[id]/similar endpoint
+      // const response = await apiClient.get(`/products/${productId}/similar`);
+      // if (response.data.success) {
+      //   setSimilarProducts(response.data.data || []);
+      // }
+      setSimilarProducts([]); // Temporary: No similar products until API is ready
     } catch (error) {
       console.error('Error fetching similar products:', error);
     }

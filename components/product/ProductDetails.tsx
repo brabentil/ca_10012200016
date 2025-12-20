@@ -102,8 +102,8 @@ export default function ProductDetails({
     },
   };
 
-  const currentCondition = conditionInfo[condition];
-  const ConditionIcon = currentCondition.icon;
+  const currentCondition = conditionInfo[condition] || conditionInfo['Good'];
+  const ConditionIcon = currentCondition?.icon || CheckCircle2;
 
   return (
     <motion.div

@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'thrifthub-product-images.s3.eu-north-1.amazonaws.com',
+        port: '',
+        pathname: '/products/**',
+      },
     ],
   },
 };
