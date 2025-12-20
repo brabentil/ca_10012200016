@@ -45,92 +45,62 @@ export default function Navbar() {
   return (
     <>
       {/* Main Header */}
-      <div className="w-full h-20 bg-primary-600 text-white sticky top-0 z-50">
-        <div className="h-full w-full mx-auto inline-flex items-center justify-between gap-1 mdl:gap-3 px-4">
+      <div className="w-full h-20 bg-primary-600 text-white sticky top-0 z-50 shadow-md">
+        <div className="h-full max-w-screen-2xl mx-auto flex items-center justify-between gap-4 px-6">
           {/* Logo */}
           <Link
             href="/"
-            className="px-2 border border-transparent hover:border-white cursor-pointer duration-300 flex items-center justify-center h-[70%]"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <ShoppingCart className="w-8 h-8 mt-1" />
+            <ShoppingCart className="w-8 h-8" />
+            <span className="text-xl font-bold hidden sm:block">ThriftHub</span>
           </Link>
 
-          {/* Delivery */}
-          <div className="px-2 border border-transparent hover:border-white cursor-pointer duration-300 items-center justify-center h-[70%] hidden xl:inline-flex gap-1">
-            <MapPin className="w-4 h-4" />
-            <div className="text-xs">
-              <p>Deliver to</p>
-              <p className="text-white font-bold uppercase">Campus</p>
-            </div>
-          </div>
-
           {/* Search Bar */}
-          <div className="flex-1 h-10 hidden md:inline-flex items-center justify-between relative">
+          <div className="flex-1 max-w-2xl h-10 relative">
             <input
               onChange={(e) => setSearchQuery(e.target.value)}
               value={searchQuery}
-              className="w-full h-full rounded-md px-2 placeholder:text-sm text-base text-black border-[3px] border-transparent outline-none focus-visible:border-secondary-500"
+              className="w-full h-full rounded-md px-4 placeholder:text-sm text-base text-black border-[3px] border-transparent outline-none focus-visible:border-secondary-500"
               type="text"
-              placeholder="Search ThriftHub products"
+              placeholder="Search products..."
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleSearch(e);
                 }
               }}
             />
-            <span 
+            <button 
               onClick={handleSearch as any}
-              className="w-12 h-full bg-secondary-500 text-black text-2xl flex items-center justify-center absolute right-0 rounded-tr-md rounded-br-md cursor-pointer hover:bg-secondary-600"
+              className="w-12 h-full bg-secondary-500 text-black flex items-center justify-center absolute right-0 top-0 rounded-tr-md rounded-br-md cursor-pointer hover:bg-secondary-600 transition-colors"
             >
               <Search className="w-5 h-5" />
-            </span>
+            </button>
           </div>
 
-          {/* Sign In */}
+          {/* Account */}
           {isAuthenticated && user ? (
-            <div className="text-xs text-gray-100 flex flex-col justify-center px-2 border border-transparent hover:border-white cursor-pointer duration-300 h-[70%]">
-              <p>Hello, {user.first_name}</p>
-              <p className="text-white font-bold">Account & Lists</p>
-            </div>
+            <Link href="/profile" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-primary-700 transition-colors">
+              <div className="text-sm">
+                <p className="text-gray-200">Hello, {user.first_name}</p>
+                <p className="text-white font-semibold">Account</p>
+              </div>
+            </Link>
           ) : (
-            <Link href="/login" className="text-xs text-gray-100 flex flex-col justify-center px-2 border border-transparent hover:border-white cursor-pointer duration-300 h-[70%]">
-              <p>Hello, sign in</p>
-              <p className="text-white font-bold">Account & Lists</p>
+            <Link href="/login" className="px-4 py-2 bg-secondary-500 text-black font-semibold rounded-md hover:bg-secondary-600 transition-colors">
+              Sign In
             </Link>
           )}
-
-          {/* Sign Out / Register Button */}
-          {isAuthenticated && user ? (
-            <button
-              onClick={handleLogout}
-              className="text-xs text-gray-100 flex flex-col justify-center px-2 border border-transparent hover:border-white cursor-pointer duration-300 h-[70%]"
-            >
-              <p className="text-secondary-400">Sign Out</p>
-            </button>
-          ) : (
-            <Link href="/register" className="text-xs text-gray-100 flex flex-col justify-center px-2 border border-transparent hover:border-white cursor-pointer duration-300 h-[70%]">
-              <p className="text-secondary-400">Create Account</p>
-            </Link>
-          )}
-
-          {/* Favorites */}
-          <Link
-            href="/wishlist"
-            className="text-xs text-gray-100 flex flex-col justify-center px-2 border border-transparent hover:border-white cursor-pointer duration-300 h-[70%] relative hidden lg:flex"
-          >
-            <p>Marked</p>
-            <p className="text-white font-bold">& Favorite</p>
-          </Link>
 
           {/* Cart */}
           <Link
             href="/cart"
-            className="flex items-center px-2 border border-transparent hover:border-white cursor-pointer duration-300 h-[70%] relative"
+            className="flex items-center gap-1 px-3 py-2 rounded-md hover:bg-primary-700 transition-colors relative"
           >
-            <ShoppingCart className="w-8 h-8" />
-            <p className="text-xs text-white font-bold mt-3">Cart</p>
+            <ShoppingCart className="w-6 h-6" />
+            <span className="text-sm font-semibold">Cart</span>
             {itemCount > 0 && (
-              <span className="absolute text-secondary-500 text-sm top-2 left-[29px] font-semibold">
+              <span className="absolute -top-1 -right-1 bg-secondary-500 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {itemCount}
               </span>
             )}

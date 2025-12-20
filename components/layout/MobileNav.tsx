@@ -60,26 +60,17 @@ export default function MobileNav() {
 
   const mainNavItems = [
     { icon: Home, label: 'Home', href: '/', badge: null },
-    { icon: ShoppingBag, label: 'Shop', href: '/products', badge: null },
-    { icon: Search, label: 'AI Style Match', href: '/style-match', badge: 'NEW' },
-    { icon: Tag, label: 'Deals', href: '/products?on_sale=true', badge: null },
-    { icon: TrendingUp, label: 'New Arrivals', href: '/products?sort=newest', badge: null },
+    { icon: ShoppingBag, label: 'Products', href: '/products', badge: null },
+    { icon: Search, label: 'Search', href: '/search', badge: null },
   ];
 
   const userNavItems = isAuthenticated
     ? [
-        { icon: User, label: 'My Profile', href: '/profile' },
-        { icon: Package, label: 'My Orders', href: '/orders' },
-        { icon: Heart, label: 'Wishlist', href: '/wishlist' },
+        { icon: User, label: 'Account', href: '/profile' },
         { icon: ShoppingCart, label: 'Cart', href: '/cart', badge: itemCount },
-        { icon: Bell, label: 'Notifications', href: '/notifications' },
-        { icon: CreditCard, label: 'Payday Flex', href: '/payday-flex' },
-        { icon: Settings, label: 'Settings', href: '/settings' },
-        { icon: HelpCircle, label: 'Help & Support', href: '/help' },
       ]
     : [
         { icon: User, label: 'Sign In', href: '/login' },
-        { icon: Sparkles, label: 'Create Account', href: '/register' },
       ];
 
   return (
@@ -149,8 +140,8 @@ export default function MobileNav() {
                 transition={{ delay: 0.1 }}
                 className="px-6 py-4 bg-gradient-to-br from-primary-50 to-secondary-50/30 border-b border-gray-200"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">
                     {user.first_name.charAt(0)}
                     {user.last_name.charAt(0)}
                   </div>
@@ -161,20 +152,11 @@ export default function MobileNav() {
                     <p className="text-xs text-gray-600 truncate">{user.email}</p>
                   </div>
                 </div>
-                {user.is_verified && (
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-semibold text-green-700">Verified Student</span>
-                  </div>
-                )}
               </motion.div>
             )}
 
             {/* Main Navigation */}
             <div className="px-4 py-4">
-              <h3 className="px-2 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                Explore
-              </h3>
               <nav className="space-y-1">
                 {mainNavItems.map((item, index) => (
                   <motion.div
@@ -197,11 +179,6 @@ export default function MobileNav() {
                         }`}
                       />
                       <span className="flex-1 font-medium">{item.label}</span>
-                      {item.badge && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold text-secondary-700 bg-secondary-100 rounded-full">
-                          {item.badge}
-                        </span>
-                      )}
                       <ChevronRight
                         className={`w-4 h-4 transition-transform group-hover:translate-x-1 ${
                           pathname === item.href ? 'text-primary-600' : 'text-gray-400'
@@ -215,9 +192,6 @@ export default function MobileNav() {
 
             {/* User Actions */}
             <div className="px-4 py-4 border-t border-gray-200">
-              <h3 className="px-2 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {isAuthenticated ? 'My Account' : 'Get Started'}
-              </h3>
               <nav className="space-y-1">
                 {userNavItems.map((item, index) => (
                   <motion.div
@@ -258,7 +232,7 @@ export default function MobileNav() {
 
             {/* Logout Button */}
             {isAuthenticated && (
-              <div className="px-4 pb-6">
+              <div className="px-4 pb-6 border-t border-gray-200 pt-4">
                 <motion.button
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -279,38 +253,13 @@ export default function MobileNav() {
               transition={{ delay: 0.6 }}
               className="px-6 pb-6 pt-4 border-t border-gray-200"
             >
-              <div className="space-y-3">
-                {/* Feature Highlights */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
-                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-green-600 font-semibold uppercase">AI Search</p>
-                      <p className="text-xs text-green-700 font-medium">Photo Match</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-blue-600 font-semibold uppercase">Payday Flex</p>
-                      <p className="text-xs text-blue-700 font-medium">Pay Later</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* App Version */}
-                <div className="text-center pt-2">
-                  <p className="text-xs text-gray-500">
-                    ThriftHub v1.0.0
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-1">
-                    © 2025 All rights reserved
-                  </p>
-                </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500">
+                  ThriftHub v1.0.0
+                </p>
+                <p className="text-[10px] text-gray-400 mt-1">
+                  © 2025 All rights reserved
+                </p>
               </div>
             </motion.div>
           </motion.div>
