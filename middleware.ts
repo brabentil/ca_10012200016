@@ -19,7 +19,7 @@ const protectedRoutes = [
 /**
  * Admin-only routes
  */
-const adminRoutes = ['/api/admin', '/api/products'];
+const adminRoutes = ['/api/admin'];
 
 /**
  * Rider-only routes
@@ -28,10 +28,14 @@ const riderRoutes = ['/api/deliveries/rider'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const { method } = request;
+
+  // Check if this is a product modification (admin only)
+  const isProductMutation = pathname.startsWith('/api/products') && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
 
   // Check if the route requires authentication
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
-  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route)) || isProductMutation;
   const isRiderRoute = riderRoutes.some((route) => pathname.startsWith(route));
 
   // Skip authentication for non-protected routes
@@ -61,7 +65,7 @@ export function middleware(request: NextRequest) {
     const payload = verifyAccessToken(token);
 
     // Check admin access
-    if (isAdminRoute && !pathname.includes('DELETE') && request.method === 'POST') {
+    if (isAdminRoute) {
       if (payload.role !== 'ADMIN') {
         return NextResponse.json(
           {
