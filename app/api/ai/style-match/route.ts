@@ -152,8 +152,8 @@ export async function POST(req: NextRequest) {
       .slice(0, 20); // Top 20 results
 
     // Delete temporary uploaded image
-    if (tempS3Key) {
-      await deleteFromS3(tempS3Key).catch((error) => {
+    if (tempS3Key && imageUrl) {
+      await deleteFromS3(imageUrl).catch((error) => {
         console.error("Error deleting temp file:", error);
       });
     }

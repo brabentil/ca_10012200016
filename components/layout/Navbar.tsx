@@ -9,7 +9,8 @@ import {
   Heart,
   Search,
   MapPin,
-  Menu
+  Menu,
+  Sparkles
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/auth';
 import { useCartStore } from '@/lib/stores/cart';
@@ -77,6 +78,15 @@ export default function Navbar() {
               <Search className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Style Matcher */}
+          <Link
+            href="/style-match"
+            className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-primary-700 transition-colors"
+          >
+            <Sparkles className="w-5 h-5" />
+            <span className="text-sm font-semibold hidden md:block">AI Match</span>
+          </Link>
 
           {/* Account */}
           {isAuthenticated && user ? (
