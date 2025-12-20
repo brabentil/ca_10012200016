@@ -1,35 +1,86 @@
-import OpenAI from "openai";
+import Replicate from "replicate";
 import { AppError } from "../errors";
+import crypto from "crypto";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const replicate = process.env.REPLICATE_API_TOKEN
+  ? new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
+    })
+  : null;
+
+const USE_DEV_MODE = !process.env.REPLICATE_API_TOKEN;
+
+/**
+ * Generate deterministic mock embedding for development
+ * Creates consistent embeddings based on URL hash
+ */
+function generateMockEmbedding(imageUrl: string): number[] {
+  // Create a deterministic seed from the URL
+  const hash = crypto.createHash("md5").update(imageUrl).digest();
+  
+  const embedding: number[] = [];
+  
+  // Generate 512 deterministic values between -1 and 1
+  for (let i = 0; i < 512; i++) {
+    const byteIndex = i % hash.length;
+    const value = (hash[byteIndex] / 255) * 2 - 1; // Normalize to [-1, 1]
+    embedding.push(value);
+  }
+  
+  // Normalize the vector to unit length (standard for embeddings)
+  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+  return embedding.map(val => val / magnitude);
+}
 
 /**
  * Generate CLIP embedding from image
+ * Uses real CLIP in production, mock embeddings in development
  * @param imageUrl - URL of the image to generate embedding from
  * @returns 512-dimensional embedding vector
  */
 export async function generateImageEmbedding(
   imageUrl: string
 ): Promise<number[]> {
+  // Development mode - use mock embeddings
+  if (USE_DEV_MODE) {
+    console.log("📝 [DEV MODE] Using mock embedding for:", imageUrl);
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+    return generateMockEmbedding(imageUrl);
+  }
+  
+  // Production mode - use real CLIP
+  if (!replicate) {
+    throw new AppError(
+      "REPLICATE_API_TOKEN not configured for production",
+      500
+    );
+  }
+  
   try {
-    // Note: OpenAI's current API doesn't support CLIP embeddings directly
-    // This is a placeholder implementation. In production, you would:
-    // 1. Use OpenAI's vision model or
-    // 2. Use a dedicated CLIP service or
-    // 3. Self-host CLIP model
+    console.log("🤖 [PRODUCTION] Generating real CLIP embedding...");
+    const output = await replicate.run(
+      "andreasjansson/clip-features:75b33f253f7714a281ad3e9b28f63e3232d583716ef6718f2e46641077ea040a",
+      {
+        input: {
+          inputs: imageUrl,
+        },
+      }
+    ) as any;
     
-    // For now, we'll use a text embedding as a placeholder
-    // In production, replace with actual CLIP embedding generation
-    const response = await openai.embeddings.create({
-      model: "text-embedding-3-small",
-      input: `image:${imageUrl}`,
-    });
-
-    const embedding = response.data[0].embedding;
+    // Extract embedding from output
+    let embedding: number[];
     
-    // Pad or truncate to 512 dimensions for consistency
+    if (Array.isArray(output)) {
+      embedding = output;
+    } else if (output.embedding) {
+      embedding = output.embedding;
+    } else if (output[0]) {
+      embedding = output[0];
+    } else {
+      throw new Error("Unexpected output format from CLIP model");
+    }
+    
+    // Normalize to 512 dimensions
     if (embedding.length > 512) {
       return embedding.slice(0, 512);
     } else if (embedding.length < 512) {
@@ -40,7 +91,7 @@ export async function generateImageEmbedding(
   } catch (error: any) {
     console.error("Error generating image embedding:", error);
     throw new AppError(
-      "Failed to generate image embedding",
+      `Failed to generate image embedding: ${error.message}`,
       500
     );
   }

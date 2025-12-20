@@ -45,3 +45,5 @@ test-aws-connection.js
 DESIGN_PATTERNS.md
 BACKEND_IMPLEMENTATION_PLAN.md
 prisma.config.ts
+FRONTEND_INTEGRATION_PLAN.md
+test-clip.ts
