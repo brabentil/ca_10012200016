@@ -35,7 +35,7 @@ export default function WishlistItem({ item, onRemove }: WishlistItemProps) {
   const [isRemoving, setIsRemoving] = useState(false);
 
   // Check if item is already in cart
-  const isInCart = items.some(cartItem => cartItem.product_id === parseInt(item.productId));
+  const isInCart = items.some(cartItem => cartItem.product_id === item.productId);
 
   // Get product image
   const productImage = item.product.images?.[0]?.imageUrl || '/images/placeholder-product.png';
