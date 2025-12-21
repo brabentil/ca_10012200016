@@ -2,12 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export interface CartItem {
-  cart_item_id: number;
-  product_id: number;
+  cart_item_id: string;
+  product_id: string;
   quantity: number;
   product_name: string;
   price: number;
-  image_url: string;
+  image_url: string | null;
   condition: string;
 }
 
@@ -56,10 +56,10 @@ export const useCartStore = create<CartState>()(
           };
         }),
       
-      updateQuantity: (productId, quantity) =>
+      updateQuantity: (cartItemId, quantity) =>
         set((state) => {
           const updatedItems = state.items.map((item) =>
-            item.product_id === productId ? { ...item, quantity } : item
+            item.cart_item_id === cartItemId ? { ...item, quantity } : item
           );
           return {
             items: updatedItems,
@@ -68,10 +68,10 @@ export const useCartStore = create<CartState>()(
           };
         }),
       
-      removeItem: (productId) =>
+      removeItem: (cartItemId) =>
         set((state) => {
           const filteredItems = state.items.filter(
-            (item) => item.product_id !== productId
+            (item) => item.cart_item_id !== cartItemId
           );
           return {
             items: filteredItems,
@@ -91,6 +91,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'cart-storage',
+      version: 1, // Increment this to invalidate old cached data
     }
   )
 );

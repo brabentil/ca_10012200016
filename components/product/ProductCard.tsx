@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Eye, Star } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
-import { useCartStore } from '@/lib/stores/cart';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api-client';
 
 interface Product {
-  product_id: number;
+  product_id: string;
   name: string;
   price: number;
   condition: 'Like New' | 'Good' | 'Fair' | 'Worn';
@@ -29,7 +29,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const { addItem } = useCartStore();
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,22 +38,28 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // Add to cart via Zustand store
-    addItem({
-      cart_item_id: Date.now(), // Temporary ID until backend assigns one
-      product_id: product.product_id,
-      quantity: 1,
-      product_name: product.name,
-      price: product.price,
-      image_url: product.images[0] || '',
-      condition: product.condition,
-    });
+    if (isAdding) return;
+    setIsAdding(true);
     
-    toast.success('Added to cart');
+    try {
+      const response = await apiClient.post('/cart/items', {
+        productId: product.product_id,
+        quantity: 1,
+      });
+      
+      if (response.data.success) {
+        toast.success('Added to cart');
+      }
+    } catch (error: any) {
+      console.error('Add to cart error:', error);
+      toast.error(error.response?.data?.error?.message || 'Failed to add to cart');
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const getConditionColor = (condition: string) => {

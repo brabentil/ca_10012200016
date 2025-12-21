@@ -27,7 +27,7 @@ import { toast } from 'sonner';
 import { formatPrice, formatDate } from '@/lib/utils';
 
 interface Product {
-  product_id: number;
+  product_id: string;
   name: string;
   description: string;
   price: number;
@@ -130,20 +130,25 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleAddToCart = () => {
-    if (!product) return;
+  const handleAddToCart = async () => {
+    if (!product || isAddingToCart) return;
     
-    addItem({
-      cart_item_id: Date.now(),
-      product_id: product.product_id,
-      product_name: product.name,
-      price: product.price,
-      image_url: product.images[0] || '',
-      condition: product.condition,
-      quantity: quantity,
-    });
-    
-    toast.success('Added to cart!');
+    setIsAddingToCart(true);
+    try {
+      const response = await apiClient.post('/cart/items', {
+        productId: product.product_id,
+        quantity: quantity,
+      });
+      
+      if (response.data.success) {
+        toast.success('Added to cart!');
+      }
+    } catch (error: any) {
+      console.error('Add to cart error:', error);
+      toast.error(error.response?.data?.error?.message || 'Failed to add to cart');
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const handleWishlistToggle = async () => {

@@ -64,12 +64,16 @@ export default function OrdersPage() {
       });
 
       if (statusFilter !== 'all') {
-        params.append('status', statusFilter);
+        params.append('status', statusFilter.toUpperCase());
       }
+
+      console.log('[Orders] Fetching orders with params:', params.toString());
 
       const response = await fetch(`/api/orders?${params.toString()}`, {
         credentials: 'include',
       });
+
+      console.log('[Orders] Response status:', response.status);
 
       if (response.status === 401) {
         toast.error('Session expired. Please login again');
@@ -78,10 +82,13 @@ export default function OrdersPage() {
       }
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[Orders] Error response:', errorData);
         throw new Error('Failed to fetch orders');
       }
 
       const data = await response.json();
+      console.log('[Orders] Response data:', data);
       
       if (data.success) {
         setOrders(data.data);
@@ -118,8 +125,9 @@ export default function OrdersPage() {
   const statusFilters = [
     { value: 'all', label: 'All Orders' },
     { value: 'pending', label: 'Pending' },
+    { value: 'confirmed', label: 'Confirmed' },
     { value: 'processing', label: 'Processing' },
-    { value: 'out_for_delivery', label: 'Out for Delivery' },
+    { value: 'shipped', label: 'Shipped' },
     { value: 'delivered', label: 'Delivered' },
     { value: 'cancelled', label: 'Cancelled' },
   ];

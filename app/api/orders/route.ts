@@ -39,9 +39,12 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    console.log('[Orders API] Received body:', JSON.stringify(body, null, 2));
+
     // Validate request body
     const validation = createOrderSchema.safeParse(body);
     if (!validation.success) {
+      console.error('[Orders API] Validation failed:', JSON.stringify(validation.error.issues, null, 2));
       return validationErrorResponse(
         'Invalid input data',
         validation.error.issues.map((issue: any) => ({

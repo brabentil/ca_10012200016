@@ -63,25 +63,18 @@ export async function GET(request: NextRequest) {
       return total + item.product.price * item.quantity;
     }, 0);
 
-    // Format response
+    // Format response - map to CartItem interface format
     const cartResponse = {
       id: cart.id,
       userId: cart.userId,
       items: cart.items.map((item: any) => ({
-        id: item.id,
-        productId: item.productId,
+        cart_item_id: item.id,
+        product_id: item.productId,
         quantity: item.quantity,
-        product: {
-          id: item.product.id,
-          title: item.product.title,
-          price: item.product.price,
-          stock: item.product.stock,
-          size: item.product.size,
-          color: item.product.color,
-          condition: item.product.condition,
-          image: item.product.images[0]?.url || null,
-        },
-        itemTotal: item.product.price * item.quantity,
+        product_name: item.product.title,
+        price: Number(item.product.price),
+        image_url: item.product.images[0]?.imageUrl || null,
+        condition: item.product.condition,
       })),
       subtotal,
       itemCount: cart.items.length,

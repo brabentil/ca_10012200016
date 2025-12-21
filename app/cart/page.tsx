@@ -10,10 +10,29 @@ import CartSummary from '@/components/cart/CartSummary';
 import EmptyState from '@/components/ui/EmptyState';
 import { useCartStore } from '@/lib/stores/cart';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api-client';
 
 export default function CartPage() {
-  const { items, itemCount, clearCart } = useCartStore();
+  const { items, itemCount, clearCart, setCart } = useCartStore();
   const [isClearing, setIsClearing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch cart from API on mount
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const response = await apiClient.get('/cart');
+        if (response.data.success) {
+          setCart(response.data.data.items || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch cart:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCart();
+  }, [setCart]);
 
   // Handle clear cart
   const handleClearCart = async () => {
@@ -35,6 +54,18 @@ export default function CartPage() {
       setIsClearing(false);
     }
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading cart...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show empty state if no items
   if (items.length === 0) {

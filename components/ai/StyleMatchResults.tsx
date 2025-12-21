@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { Heart, ShoppingCart, Sparkles, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { formatPrice } from '@/lib/utils';
-import { useCartStore } from '@/lib/stores/cart';
 import { toast } from 'sonner';
 import SimilarityBadge, { CompactSimilarityBadge } from './SimilarityBadge';
+import apiClient from '@/lib/api-client';
 
 interface StyleMatchProduct {
   id: number;
@@ -93,7 +93,6 @@ const EmptyState = () => {
 const StyleMatchCard = ({ product, index }: { product: StyleMatchProduct; index: number }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const { addItem } = useCartStore();
 
   // Convert similarity score (0-1) to percentage (0-100)
   const similarityPercentage = product.similarityScore * 100;
@@ -105,21 +104,23 @@ const StyleMatchCard = ({ product, index }: { product: StyleMatchProduct; index:
     toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    addItem({
-      cart_item_id: Date.now(),
-      product_id: product.id,
-      quantity: 1,
-      product_name: product.title,
-      price: product.price,
-      image_url: product.primaryImage || '',
-      condition: product.condition as any,
-    });
-    
-    toast.success('Added to cart');
+    try {
+      const response = await apiClient.post('/cart/items', {
+        productId: product.id,
+        quantity: 1,
+      });
+      
+      if (response.data.success) {
+        toast.success('Added to cart');
+      }
+    } catch (error: any) {
+      console.error('Add to cart error:', error);
+      toast.error(error.response?.data?.error?.message || 'Failed to add to cart');
+    }
   };
 
   const getConditionDisplay = (condition: string) => {

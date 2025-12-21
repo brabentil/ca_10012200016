@@ -12,8 +12,8 @@ export function useCart() {
   const { data: cartData, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
-      const response = await apiClient.get<{ cart: CartItem[] }>('/cart');
-      return response.data.cart;
+      const response = await apiClient.get('/cart');
+      return response.data.data.items || [];
     },
   });
 
@@ -41,7 +41,7 @@ export function useCart() {
 
   // Update quantity mutation
   const { mutate: updateQuantity, isPending: isUpdating } = useMutation({
-    mutationFn: async ({ itemId, quantity }: { itemId: number; quantity: number }) => {
+    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
       const response = await apiClient.patch(`/cart/items/${itemId}`, { quantity });
       return response.data;
     },
@@ -56,7 +56,7 @@ export function useCart() {
 
   // Remove item mutation
   const { mutate: removeItem, isPending: isRemoving } = useMutation({
-    mutationFn: async (itemId: number) => {
+    mutationFn: async (itemId: string) => {
       await apiClient.delete(`/cart/items/${itemId}`);
     },
     onSuccess: () => {

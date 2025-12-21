@@ -28,7 +28,7 @@ export default function CartItem({ item }: CartItemProps) {
     
     try {
       // Optimistically update UI
-      updateQuantity(item.product_id, newQuantity);
+      updateQuantity(item.cart_item_id, newQuantity);
       
       // API call to update cart on server
       const response = await fetch(`/api/cart/items/${item.cart_item_id}`, {
@@ -39,11 +39,11 @@ export default function CartItem({ item }: CartItemProps) {
       
       if (!response.ok) {
         // Revert on failure
-        updateQuantity(item.product_id, item.quantity);
+        updateQuantity(item.cart_item_id, item.quantity);
         toast.error('Failed to update quantity');
       }
     } catch (error) {
-      updateQuantity(item.product_id, item.quantity);
+      updateQuantity(item.cart_item_id, item.quantity);
       toast.error('Failed to update quantity');
     } finally {
       setTimeout(() => setIsUpdating(false), 300);
@@ -59,7 +59,7 @@ export default function CartItem({ item }: CartItemProps) {
     
     try {
       // Optimistically update UI
-      updateQuantity(item.product_id, newQuantity);
+      updateQuantity(item.cart_item_id, newQuantity);
       
       // API call to update cart on server
       const response = await fetch(`/api/cart/items/${item.cart_item_id}`, {
@@ -70,11 +70,11 @@ export default function CartItem({ item }: CartItemProps) {
       
       if (!response.ok) {
         // Revert on failure
-        updateQuantity(item.product_id, item.quantity);
+        updateQuantity(item.cart_item_id, item.quantity);
         toast.error('Failed to update quantity');
       }
     } catch (error) {
-      updateQuantity(item.product_id, item.quantity);
+      updateQuantity(item.cart_item_id, item.quantity);
       toast.error('Failed to update quantity');
     } finally {
       setTimeout(() => setIsUpdating(false), 300);
@@ -96,7 +96,7 @@ export default function CartItem({ item }: CartItemProps) {
       if (response.ok) {
         // Delay for exit animation
         setTimeout(() => {
-          removeItem(item.product_id);
+          removeItem(item.cart_item_id);
           toast.success('Item removed from cart');
         }, 300);
       } else {
@@ -131,7 +131,7 @@ export default function CartItem({ item }: CartItemProps) {
             >
               <div className="w-24 h-24 sm:w-28 sm:h-28 relative rounded-md overflow-hidden bg-gray-100">
                 <Image
-                  src={item.image_url}
+                  src={item.image_url || '/placeholder.jpg'}
                   alt={item.product_name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"

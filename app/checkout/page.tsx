@@ -119,6 +119,20 @@ export default function CheckoutPage() {
       console.log('[Checkout] Document cookies:', document.cookie);
       console.log('[Checkout] Cart items:', items.length);
       
+      const orderPayload = {
+        deliveryAddress: deliveryAddress.deliveryAddress,
+        campusZone: deliveryAddress.campusZone,
+        paymentMethod,
+        deliveryFee: deliveryFee,
+        items: items.map(item => ({
+          productId: item.product_id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+      };
+      
+      console.log('[Checkout] Order payload:', JSON.stringify(orderPayload, null, 2));
+      
       // Create order (uses httpOnly cookies for auth)
       // Send cart items directly since cart only exists in localStorage
       const orderResponse = await fetch('/api/orders', {
@@ -127,17 +141,7 @@ export default function CheckoutPage() {
           'Content-Type': 'application/json',
         },
         credentials: 'include', // Include cookies
-        body: JSON.stringify({
-          deliveryAddress: deliveryAddress.deliveryAddress,
-          campusZone: deliveryAddress.campusZone,
-          paymentMethod,
-          deliveryFee: deliveryFee,
-          items: items.map(item => ({
-            productId: item.product_id,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-        }),
+        body: JSON.stringify(orderPayload),
       });
 
       if (!orderResponse.ok) {
