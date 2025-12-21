@@ -205,12 +205,11 @@ export default function OrderDetailsPage() {
             <p className="text-gray-600 mb-6">
               We couldn't find the order you're looking for.
             </p>
-            <Link href="/orders">
-              <Button>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Orders
-              </Button>
-            </Link>
+            <BackButton 
+              href="/orders"
+              label="Back to Orders"
+              variant="default"
+            />
           </Card>
         </div>
       </div>
