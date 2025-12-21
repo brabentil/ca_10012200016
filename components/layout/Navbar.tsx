@@ -92,7 +92,7 @@ export default function Navbar() {
           {isAuthenticated && user ? (
             <Link href="/profile" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-primary-700 transition-colors">
               <div className="text-sm">
-                <p className="text-gray-200">Hello, {user.first_name}</p>
+                <p className="text-gray-200">Hello, {user.firstName}</p>
                 <p className="text-white font-semibold">Account</p>
               </div>
             </Link>
