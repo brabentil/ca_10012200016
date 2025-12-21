@@ -52,10 +52,25 @@ export async function PATCH(request: NextRequest) {
         role: true,
         createdAt: true,
         updatedAt: true,
+        studentVerification: {
+          select: {
+            status: true,
+            eduEmail: true,
+            campus: true,
+            verifiedAt: true,
+          },
+        },
       },
     });
 
-    return successResponse(updatedUser, 'Profile updated successfully');
+    // Map studentVerification to verification for consistency with /api/auth/me
+    const { studentVerification, ...userData } = updatedUser;
+    const responseData = {
+      ...userData,
+      verification: studentVerification || null,
+    };
+
+    return successResponse(responseData, 'Profile updated successfully');
   } catch (error) {
     console.error('Update profile error:', error);
     return internalServerErrorResponse('Failed to update profile');
