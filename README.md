@@ -8,8 +8,6 @@ A comprehensive e-commerce platform designed for university students in Ghana, p
 
 **Production URL:** [https://thrifthub-orcin.vercel.app/](https://thrifthub-orcin.vercel.app/)
 
-**GitHub Repository:** `ca_indexnumber`
-
 ## 📋 Project Overview
 
 ThriftHub Ghana addresses critical challenges faced by Ghanaian students:
