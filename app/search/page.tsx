@@ -11,7 +11,7 @@ import apiClient from '@/lib/api-client';
 import { toast } from 'sonner';
 
 interface Product {
-  product_id: number;
+  product_id: string;
   name: string;
   price: number;
   condition: 'Like New' | 'Good' | 'Fair' | 'Worn';
