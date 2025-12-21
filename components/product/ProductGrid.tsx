@@ -5,7 +5,7 @@ import ProductCard from './ProductCard';
 import { Package, Search } from 'lucide-react';
 
 interface Product {
-  product_id: number;
+  product_id: string;
   name: string;
   price: number;
   condition: 'Like New' | 'Good' | 'Fair' | 'Worn';

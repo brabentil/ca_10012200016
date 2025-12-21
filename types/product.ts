@@ -1,5 +1,5 @@
 export interface Product {
-  product_id: number;
+  product_id: string;
   seller_id: number;
   product_name: string;
   description: string;
@@ -17,7 +17,7 @@ export interface Product {
 
 export interface ProductImage {
   image_id: number;
-  product_id: number;
+  product_id: string;
   image_url: string;
   display_order: number;
 }

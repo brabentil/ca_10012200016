@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import ProductCard from './ProductCard';
 
 interface Product {
-  product_id: number;
+  product_id: string;
   name: string;
   price: number;
   condition: 'Like New' | 'Good' | 'Fair' | 'Worn';
