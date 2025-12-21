@@ -45,17 +45,12 @@ export default function OrderStatusUpdater({
    * Update order status via API
    */
   const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-      throw new Error('Not authenticated');
-    }
-
     const response = await fetch(`/api/admin/orders/${orderId}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
       },
+      credentials: 'include',
       body: JSON.stringify({ status }),
     });
 

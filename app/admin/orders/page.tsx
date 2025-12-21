@@ -150,7 +150,7 @@ export default function AdminOrdersPage() {
    * Format currency
    */
   const formatCurrency = (amount: number) => {
-    return `GH₵${amount.toFixed(2)}`;
+    return `GH₵${Number(amount).toFixed(2)}`;
   };
 
   /**

@@ -44,8 +44,8 @@ export default function AdminDashboardPage() {
         const response = await apiClient.get('/admin/analytics/sales', {
           params: { groupBy },
         });
-        if (response.data.success && Array.isArray(response.data.data)) {
-          setSalesData(response.data.data);
+        if (response.data.success && response.data.data?.salesData) {
+          setSalesData(response.data.data.salesData);
         } else {
           setSalesData([]);
         }

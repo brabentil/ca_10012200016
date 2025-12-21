@@ -119,7 +119,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* User Profile - Mobile */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-[#003399] flex items-center justify-center text-white text-sm font-semibold">
-            {user?.first_name?.[0]}{user?.last_name?.[0]}
+            {user?.firstName?.[0]}{user?.lastName?.[0]}
           </div>
         </div>
       </div>
@@ -246,7 +246,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             >
               <p className="text-xs font-medium text-gray-500 mb-1">Logged in as</p>
               <p className="text-sm font-semibold text-gray-900 truncate">
-                {user.first_name} {user.last_name}
+                {user.firstName} {user.lastName}
               </p>
               <p className="text-xs text-gray-500 truncate">{user.email}</p>
             </motion.div>
@@ -256,7 +256,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {!sidebarOpen && user && (
             <div className="flex justify-center mb-2">
               <div className="w-10 h-10 rounded-full bg-[#003399] flex items-center justify-center text-white text-sm font-semibold">
-                {user.first_name?.[0]}{user.last_name?.[0]}
+                {user.firstName?.[0]}{user.lastName?.[0]}
               </div>
             </div>
           )}
@@ -378,7 +378,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <div className="px-3 py-2 mb-3">
                     <p className="text-xs font-medium text-gray-500 mb-1">Logged in as</p>
                     <p className="text-sm font-semibold text-gray-900 truncate">
-                      {user.first_name} {user.last_name}
+                      {user.firstName} {user.lastName}
                     </p>
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
                   </div>

@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Fetch orders within date range (all orders except cancelled)
+    // Fetch orders within date range (confirmed and completed orders only)
     const orders = await prisma.order.findMany({
       where: {
         createdAt: {
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
           lte: endOfDay(dateTo),
         },
         status: {
-          not: "CANCELLED",
+          in: ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"],
         },
       },
       select: {
@@ -192,12 +192,14 @@ export async function GET(req: NextRequest) {
 
     const topProductsWithDetails = topProducts.map((item) => {
       const product = products.find((p) => p.id === item.productId);
+      const quantity = item._sum.quantity || 0;
+      const priceAtPurchase = item._sum.priceAtPurchase || 0;
       return {
         productId: item.productId,
         productTitle: product?.title || "Unknown",
         productCategory: product?.category || "Unknown",
-        quantitySold: item._sum.quantity || 0,
-        totalRevenue: item._sum.priceAtPurchase || 0,
+        quantitySold: quantity,
+        totalRevenue: priceAtPurchase * quantity,
       };
     });
 

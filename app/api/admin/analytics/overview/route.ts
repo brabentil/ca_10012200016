@@ -50,8 +50,14 @@ export async function GET(req: NextRequest) {
       return errorResponse("ACCOUNT_INACTIVE", "Account is inactive", 403);
     }
 
-    // Get total orders count
-    const totalOrders = await prisma.order.count();
+    // Get total orders count (only confirmed and completed orders)
+    const totalOrders = await prisma.order.count({
+      where: {
+        status: {
+          in: ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"],
+        },
+      },
+    });
 
     // Get total revenue (sum of all completed orders)
     const revenueData = await prisma.order.aggregate({
@@ -83,7 +89,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Get recent orders (last 7 days)
+    // Get recent orders (last 7 days, confirmed and completed only)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -91,6 +97,9 @@ export async function GET(req: NextRequest) {
       where: {
         createdAt: {
           gte: sevenDaysAgo,
+        },
+        status: {
+          in: ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"],
         },
       },
     });
