@@ -259,12 +259,11 @@ export default function TrackDeliveryPage() {
             <p className="text-gray-600 mb-6">
               We couldn't find tracking information for this order.
             </p>
-            <Link href={`/orders/${orderId}`}>
-              <Button>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Order Details
-              </Button>
-            </Link>
+            <BackButton 
+              href={`/orders/${orderId}`}
+              label="Back to Order Details"
+              variant="default"
+            />
           </Card>
         </div>
       </div>
@@ -280,12 +279,12 @@ export default function TrackDeliveryPage() {
           animate={{ opacity: 1, x: 0 }}
           className="mb-6"
         >
-          <Link href={`/orders/${orderId}`}>
-            <Button variant="outline" className="border-2">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Order Details
-            </Button>
-          </Link>
+          <BackButton 
+            href={`/orders/${orderId}`}
+            label="Back to Order Details"
+            variant="outline"
+            className="border-2"
+          />
         </motion.div>
 
         {/* Page Header */}

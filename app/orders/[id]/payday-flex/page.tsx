@@ -221,13 +221,12 @@ export default function PaydayFlexDetailsPage() {
       >
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <Link
+            <BackButton 
               href="/orders"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm">Back to Orders</span>
-            </Link>
+              label="Back to Orders"
+              variant="link"
+              className="text-white/80 hover:text-white mb-4 text-sm"
+            />
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
                 <Calendar className="w-8 h-8" />
@@ -452,8 +451,8 @@ export default function PaydayFlexDetailsPage() {
               onClick={() => router.push('/orders')}
               variant="outline"
               className="flex-1 h-12 text-base border-2"
+              onClick={() => router.push('/orders')}
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Orders
             </Button>
           </motion.div>

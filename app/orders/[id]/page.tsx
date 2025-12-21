@@ -225,12 +225,12 @@ export default function OrderDetailsPage() {
           animate={{ opacity: 1, x: 0 }}
           className="mb-6"
         >
-          <Link href="/orders">
-            <Button variant="outline" className="border-2">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Orders
-            </Button>
-          </Link>
+          <BackButton 
+            href="/orders"
+            label="Back to Orders"
+            variant="outline"
+            className="border-2"
+          />
         </motion.div>
 
         {/* Page Header */}
