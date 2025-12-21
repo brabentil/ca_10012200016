@@ -99,13 +99,6 @@ export default function ReviewStats({
             </div>
           )}
         </div>
-
-        {/* Encouragement Text */}
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Share your experience to help others make informed decisions
-          </p>
-        </div>
       </Card>
     </motion.div>
   );

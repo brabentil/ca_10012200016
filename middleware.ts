@@ -30,6 +30,11 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const { method } = request;
 
+  // Allow GET requests to reviews (reading reviews is public)
+  if (pathname.startsWith('/api/reviews') && method === 'GET') {
+    return NextResponse.next();
+  }
+
   // Check if this is a product modification (admin only)
   const isProductMutation = pathname.startsWith('/api/products') && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
 

@@ -15,7 +15,7 @@ export async function GET(
     const { productId } = await params;
 
     // Validate productId format
-    if (!productId || productId.length < 20) {
+    if (!productId || typeof productId !== 'string') {
       return errorResponse(
         "INVALID_PRODUCT_ID",
         "Invalid product ID format",

@@ -135,7 +135,7 @@ export default function ReviewForm({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Star Rating */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-3">
+            <label className="block text-sm font-medium text-gray-900 mb-2">
               Rating <span className="text-red-500">*</span>
             </label>
             <div className="flex items-center gap-2">
@@ -167,24 +167,19 @@ export default function ReviewForm({
                 </motion.span>
               )}
             </div>
-            {rating === 0 && (
-              <p className="text-xs text-gray-600 mt-2">
-                Click the stars to rate your experience
-              </p>
-            )}
           </div>
 
           {/* Comment Textarea */}
           <div>
-            <label htmlFor="comment" className="block text-sm font-semibold text-gray-900 mb-2">
-              Your Review (Optional)
+            <label htmlFor="comment" className="block text-sm font-medium text-gray-900 mb-2">
+              Review (Optional)
             </label>
             <textarea
               id="comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Share your experience with this product..."
-              rows={5}
+              placeholder="Share your experience..."
+              rows={4}
               maxLength={1000}
               className="
                 w-full px-4 py-3 
@@ -195,10 +190,7 @@ export default function ReviewForm({
                 resize-none
               "
             />
-            <div className="flex items-center justify-between mt-2">
-              <p className="text-xs text-gray-600">
-                Help others by sharing your honest thoughts
-              </p>
+            <div className="flex justify-end mt-1">
               <span className="text-xs text-gray-500">
                 {comment.length}/1000
               </span>
@@ -224,17 +216,6 @@ export default function ReviewForm({
                 </>
               )}
             </Button>
-          </div>
-
-          {/* Guidelines */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-blue-900 mb-2">Review Guidelines</h4>
-            <ul className="text-xs text-blue-700 space-y-1">
-              <li>• Be honest and constructive in your feedback</li>
-              <li>• Focus on your personal experience with the product</li>
-              <li>• Avoid inappropriate language or personal information</li>
-              <li>• You can only review products you have purchased</li>
-            </ul>
           </div>
         </form>
       </Card>

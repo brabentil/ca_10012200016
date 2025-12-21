@@ -52,7 +52,9 @@ export default function ProductReviews({
       );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch reviews');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Reviews API error:', response.status, errorData);
+        throw new Error(errorData.message || `Failed to fetch reviews (${response.status})`);
       }
 
       const data = await response.json();
@@ -67,9 +69,7 @@ export default function ProductReviews({
         setTotalReviews(data.pagination.total);
         setHasMore(data.pagination.page < data.pagination.pages);
         
-        // Calculate stats from the response
-        // Note: The API should ideally return these stats
-        // For now, we'll calculate from fetched reviews
+        // Calculate stats from all reviews (first page for now)
         if (data.data.length > 0) {
           const sum = data.data.reduce((acc: number, r: Review) => acc + r.rating, 0);
           setAverageRating(sum / data.data.length);
@@ -86,13 +86,19 @@ export default function ProductReviews({
               count: count as number,
             }))
           );
+        } else {
+          // No reviews yet
+          setAverageRating(0);
+          setRatingDistribution([]);
         }
       } else {
         throw new Error(data.message || 'Failed to fetch reviews');
       }
     } catch (error) {
       console.error('Error fetching reviews:', error);
-      setError('Failed to load reviews');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load reviews';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -183,12 +189,9 @@ export default function ProductReviews({
             className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300"
           >
             <Star className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
               No Reviews Yet
             </h3>
-            <p className="text-gray-600 mb-4">
-              Be the first to share your experience with this product!
-            </p>
             <Button
               onClick={() => setShowReviewForm(true)}
               className="bg-primary-600 hover:bg-primary-700"
@@ -233,17 +236,6 @@ export default function ProductReviews({
                   )}
                 </Button>
               </div>
-            )}
-
-            {/* End of Reviews Message */}
-            {!hasMore && reviews.length > 5 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-6 text-gray-600 text-sm"
-              >
-                You've reached the end of reviews
-              </motion.div>
             )}
           </>
         )}

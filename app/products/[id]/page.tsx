@@ -19,6 +19,7 @@ import {
 import ProductImageGallery from '@/components/product/ProductImageGallery';
 import ProductDetails from '@/components/product/ProductDetails';
 import SimilarProducts from '@/components/product/SimilarProducts';
+import ProductReviews from '@/components/product/ProductReviews';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/stores/cart';
 import apiClient from '@/lib/api-client';
@@ -393,6 +394,19 @@ export default function ProductDetailPage() {
             </div>
           </motion.div>
         </div>
+
+        {/* Product Reviews Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-12"
+        >
+          <ProductReviews
+            productId={params.id as string}
+            productTitle={product.name}
+          />
+        </motion.div>
 
         {/* Similar Products */}
         {similarProducts.length > 0 && (
