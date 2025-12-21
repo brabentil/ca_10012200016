@@ -16,8 +16,8 @@ interface CartState {
   itemCount: number;
   totalAmount: number;
   addItem: (item: CartItem) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
-  removeItem: (productId: number) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string) => void;
   clearCart: () => void;
   setCart: (items: CartItem[]) => void;
 }
