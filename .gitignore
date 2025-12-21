@@ -47,3 +47,4 @@ BACKEND_IMPLEMENTATION_PLAN.md
 prisma.config.ts
 FRONTEND_INTEGRATION_PLAN.md
 test-clip.ts
+insomnia_collection.json
