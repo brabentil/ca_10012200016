@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Eye, Star } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
+import { useAuthStore } from '@/lib/stores/auth';
 
 interface Product {
   product_id: string;
@@ -27,6 +29,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -34,6 +38,13 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to wishlist');
+      router.push('/auth/login');
+      return;
+    }
+    
     setIsWishlisted(!isWishlisted);
     toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
   };
@@ -41,6 +52,12 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to cart');
+      router.push('/auth/login');
+      return;
+    }
     
     if (isAdding) return;
     setIsAdding(true);

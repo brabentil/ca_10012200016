@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, ArrowLeft, Trash2, ShoppingCart, Loader2 } from 'lucide-react';
+import { Heart, Trash2, ShoppingCart, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import WishlistItem, { WishlistItemType } from '@/components/wishlist/WishlistItem';
 import EmptyState from '@/components/ui/EmptyState';
 import { toast } from 'sonner';
@@ -154,13 +155,12 @@ export default function WishlistPage() {
           </div>
 
           {/* Continue Shopping Link */}
-          <Link 
-            href="/products"
-            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Continue Shopping
-          </Link>
+          <BackButton 
+            href="/products" 
+            label="Continue Shopping"
+            variant="link"
+            className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+          />
         </motion.div>
 
         {/* Wishlist Items Grid */}

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, ArrowLeft, Trash2, AlertCircle } from 'lucide-react';
+import { ShoppingCart, Trash2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import CartItem from '@/components/cart/CartItem';
 import CartSummary from '@/components/cart/CartSummary';
 import EmptyState from '@/components/ui/EmptyState';
@@ -81,6 +82,9 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <BackButton href="/products" label="Continue Shopping" className="mb-4" />
+        
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -114,13 +118,12 @@ export default function CartPage() {
           </div>
 
           {/* Continue Shopping Link */}
-          <Link 
+          <BackButton 
             href="/products"
-            className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Continue Shopping
-          </Link>
+            label="Continue Shopping"
+            variant="link"
+            className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+          />
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -207,15 +210,12 @@ export default function CartPage() {
           transition={{ delay: 0.4 }}
           className="mt-8 sm:hidden"
         >
-          <Link href="/products">
-            <Button 
-              variant="outline" 
-              className="w-full border-2 border-gray-300"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Continue Shopping
-            </Button>
-          </Link>
+          <BackButton 
+            href="/products"
+            label="Continue Shopping"
+            variant="outline"
+            className="w-full border-2 border-gray-300"
+          />
         </motion.div>
       </div>
     </div>

@@ -7,8 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Trash2, Heart, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/stores/cart';
+import { useAuthStore } from '@/lib/stores/auth';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export interface WishlistItemType {
   id: string;
@@ -30,6 +32,8 @@ interface WishlistItemProps {
 }
 
 export default function WishlistItem({ item, onRemove }: WishlistItemProps) {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const { addItem, items } = useCartStore();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
@@ -42,6 +46,12 @@ export default function WishlistItem({ item, onRemove }: WishlistItemProps) {
 
   // Handle add to cart
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to cart');
+      router.push('/auth/login');
+      return;
+    }
+    
     if (isAddingToCart || isInCart) return;
 
     setIsAddingToCart(true);

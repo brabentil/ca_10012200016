@@ -6,6 +6,8 @@ import { Star, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { useAuthStore } from '@/lib/stores/auth';
+import apiClient from '@/lib/api-client';
 
 interface ReviewFormProps {
   productId: string;
@@ -20,6 +22,7 @@ export default function ReviewForm({
   onSuccess,
   className = '',
 }: ReviewFormProps) {
+  const { isAuthenticated } = useAuthStore();
   const [rating, setRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
@@ -35,32 +38,23 @@ export default function ReviewForm({
       return;
     }
 
+    if (!isAuthenticated) {
+      toast.error('Please login to submit a review');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      if (!token) {
-        toast.error('Please login to submit a review');
-        return;
-      }
-
-      const response = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId,
-          rating,
-          comment: comment.trim() || undefined,
-        }),
+      const response = await apiClient.post('/reviews', {
+        productId,
+        rating,
+        comment: comment.trim() || undefined,
       });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok && data.success) {
+      if (data.success) {
         setSubmitted(true);
         toast.success('Review submitted successfully!');
         
@@ -71,21 +65,56 @@ export default function ReviewForm({
           setSubmitted(false);
           onSuccess?.();
         }, 2000);
-      } else {
-        // Handle specific error cases
-        if (data.code === 'REVIEW_EXISTS') {
-          toast.error('You have already reviewed this product');
-        } else if (data.code === 'PURCHASE_REQUIRED') {
-          toast.error('You can only review products you have purchased');
-        } else if (data.code === 'VALIDATION_ERROR') {
-          toast.error(data.errors?.[0]?.message || 'Invalid review data');
-        } else {
-          toast.error(data.message || 'Failed to submit review');
-        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting review:', error);
-      toast.error('Failed to submit review. Please try again.');
+      
+      // Handle specific error cases from API response
+      const data = error.response?.data;
+      const errorMessage = data?.message || 'Failed to submit review. Please try again.';
+      
+      if (data?.code === 'REVIEW_EXISTS') {
+        toast.error(errorMessage, {
+          duration: 5000,
+          description: 'You can only submit one review per product.'
+        });
+      } else if (data?.code === 'PURCHASE_REQUIRED') {
+        toast.error(errorMessage, {
+          duration: 6000,
+          description: 'Purchase this product first to leave a review.'
+        });
+      } else if (data?.code === 'VALIDATION_ERROR') {
+        const validationMsg = data.errors?.[0]?.message || 'Invalid review data';
+        toast.error('Validation Error', {
+          duration: 5000,
+          description: validationMsg
+        });
+      } else if (data?.code === 'UNAUTHORIZED' || data?.code === 'INVALID_TOKEN') {
+        toast.error('Session Expired', {
+          duration: 5000,
+          description: 'Please log in again to submit your review.'
+        });
+      } else if (data?.code === 'ACCOUNT_INACTIVE') {
+        toast.error('Account Inactive', {
+          duration: 5000,
+          description: 'Your account needs to be active to submit reviews.'
+        });
+      } else if (data?.code === 'PRODUCT_NOT_FOUND') {
+        toast.error('Product Not Found', {
+          duration: 5000,
+          description: 'This product no longer exists.'
+        });
+      } else if (data?.code === 'PRODUCT_INACTIVE') {
+        toast.error('Product Unavailable', {
+          duration: 5000,
+          description: 'This product is no longer available for reviews.'
+        });
+      } else {
+        toast.error('Review Submission Failed', {
+          duration: 5000,
+          description: errorMessage
+        });
+      }
     } finally {
       setLoading(false);
     }

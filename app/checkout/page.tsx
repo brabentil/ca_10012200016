@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import CheckoutStepper, { CheckoutStep } from '@/components/checkout/CheckoutStepper';
 import DeliveryAddressForm, { DeliveryAddressData } from '@/components/checkout/DeliveryAddressForm';
 import PaymentMethodSelector from '@/components/checkout/PaymentMethodSelector';

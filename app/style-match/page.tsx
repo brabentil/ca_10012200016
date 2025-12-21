@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Sparkles, Info } from 'lucide-react';
+import { Sparkles, Info } from 'lucide-react';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import BackButton from '@/components/ui/back-button';
 import ImageUploader from '@/components/ai/ImageUploader';
 import ImagePreview from '@/components/ai/ImagePreview';
 import StyleMatchResults from '@/components/ai/StyleMatchResults';
@@ -122,13 +123,11 @@ export default function StyleMatchPage() {
         {/* Header Section */}
         <section className="bg-primary-600 text-white py-12">
           <div className="max-w-screen-2xl mx-auto px-6">
-            <Link 
+            <BackButton 
               href="/"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Back to Home
-            </Link>
+              label="Back to Home"
+              className="mb-6 text-white/80 hover:text-white hover:bg-primary-700"
+            />
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}

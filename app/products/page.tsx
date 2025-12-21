@@ -6,6 +6,7 @@ import { SlidersHorizontal, X, ChevronLeft, ChevronRight, Search, Package } from
 import ProductGrid from '@/components/product/ProductGrid';
 import ProductFilters from '@/components/product/ProductFilters';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import apiClient from '@/lib/api-client';
 import { toast } from 'sonner';
 
@@ -128,37 +129,52 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-300 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Header Section */}
+      <div className="bg-primary-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+          {/* Back Button */}
+          <BackButton 
+            href="/" 
+            label="Back to Home" 
+            className="mb-6 text-white/90 hover:text-white hover:bg-primary-700"
+          />
+          
+          {/* Title and Count - Centered */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-6 sm:mb-8"
           >
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">All Products</h1>
-            <p className="text-gray-600">
-              {isLoading ? 'Loading products...' : `${totalProducts} items available`}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">Browse Products</h1>
+            <p className="text-white/80 text-sm sm:text-base">
+              {isLoading ? 'Loading products...' : `Discover ${totalProducts} unique items`}
             </p>
+            {!isLoading && totalProducts > 0 && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 mt-4 bg-white/10 rounded-lg backdrop-blur-sm">
+                <Package className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="font-semibold text-sm sm:text-base">{totalProducts} Items</span>
+              </div>
+            )}
           </motion.div>
 
-          {/* Search Bar */}
+          {/* Search Bar - Centered */}
           <motion.form
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
+            transition={{ delay: 0.1, duration: 0.4 }}
             onSubmit={handleSearch}
-            className="mt-6"
+            className="max-w-3xl mx-auto"
           >
-            <div className="relative max-w-2xl">
+            <div className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for products..."
-                className="w-full h-12 pl-12 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                placeholder="Search for clothing, accessories, and more..."
+                className="w-full h-12 sm:h-14 pl-12 sm:pl-14 pr-12 text-sm sm:text-base text-gray-900 bg-white rounded-xl border-2 border-white/20 focus:outline-none focus:ring-2 focus:ring-secondary-400 focus:border-transparent shadow-lg transition-all placeholder:text-gray-500"
               />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
               {searchQuery && (
                 <button
                   type="button"
@@ -166,9 +182,9 @@ export default function ProductsPage() {
                     setSearchQuery('');
                     setActiveFilters({ ...activeFilters, search: undefined });
                   }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-full transition-colors"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
             </div>
@@ -178,17 +194,17 @@ export default function ProductsPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="lg:hidden mt-4"
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="lg:hidden mt-4 sm:mt-6 max-w-3xl mx-auto"
           >
             <Button
               onClick={() => setFiltersOpen(true)}
-              className="w-full h-12 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-all"
+              className="w-full h-11 sm:h-12 bg-white text-primary-600 hover:bg-white/90 font-semibold rounded-xl shadow-lg transition-all text-sm sm:text-base"
             >
-              <SlidersHorizontal className="w-5 h-5 mr-2" />
+              <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Filters
               {activeFilterCount > 0 && (
-                <span className="ml-2 px-2 py-0.5 bg-secondary-500 text-white text-xs font-bold rounded-full">
+                <span className="ml-2 px-2 sm:px-2.5 py-0.5 bg-secondary-500 text-white text-xs font-bold rounded-full">
                   {activeFilterCount}
                 </span>
               )}

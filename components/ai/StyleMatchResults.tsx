@@ -2,12 +2,14 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Heart, ShoppingCart, Sparkles, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
 import SimilarityBadge, { CompactSimilarityBadge } from './SimilarityBadge';
 import apiClient from '@/lib/api-client';
+import { useAuthStore } from '@/lib/stores/auth';
 
 interface StyleMatchProduct {
   id: number;
@@ -91,6 +93,8 @@ const EmptyState = () => {
 };
 
 const StyleMatchCard = ({ product, index }: { product: StyleMatchProduct; index: number }) => {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -100,6 +104,13 @@ const StyleMatchCard = ({ product, index }: { product: StyleMatchProduct; index:
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to wishlist');
+      router.push('/auth/login');
+      return;
+    }
+    
     setIsWishlisted(!isWishlisted);
     toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
   };
@@ -107,6 +118,12 @@ const StyleMatchCard = ({ product, index }: { product: StyleMatchProduct; index:
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to cart');
+      router.push('/auth/login');
+      return;
+    }
     
     try {
       const response = await apiClient.post('/cart/items', {

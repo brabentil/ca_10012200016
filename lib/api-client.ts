@@ -32,7 +32,7 @@ apiClient.interceptors.response.use(
         // Retry the original request
         return apiClient.request(error.config!);
       } catch (refreshError) {
-        // Redirect to login
+        // Silently redirect to login without showing error toast
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }

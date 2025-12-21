@@ -7,6 +7,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
@@ -14,8 +15,7 @@ import {
   Mail, 
   Shield, 
   IdCard,
-  MapPin,
-  ArrowLeft
+  MapPin
 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { toast } from 'sonner';
@@ -72,12 +72,7 @@ export default function StudentVerificationPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">
       <div className="container mx-auto px-4 py-8 sm:py-12">
         {/* Back Button */}
-        <Link href="/profile">
-          <Button variant="ghost" className="mb-6 group">
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Profile
-          </Button>
-        </Link>
+        <BackButton href="/profile" label="Back to Profile" className="mb-6" />
 
         <div className="max-w-2xl mx-auto">
           <motion.div

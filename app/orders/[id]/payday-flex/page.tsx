@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-  ArrowLeft,
   Calendar,
   DollarSign,
   Package,
@@ -18,6 +17,7 @@ import {
   User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import { Card } from '@/components/ui/card';
 import PaymentStatusCard from '@/components/checkout/PaymentStatusCard';
 import InstallmentSummary from '@/components/checkout/InstallmentSummary';

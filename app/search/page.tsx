@@ -3,10 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SlidersHorizontal, X, ChevronLeft, ChevronRight, Search, Package, ArrowLeft } from 'lucide-react';
+import { SlidersHorizontal, X, ChevronLeft, ChevronRight, Search, Package } from 'lucide-react';
 import ProductGrid from '@/components/product/ProductGrid';
 import ProductFilters from '@/components/product/ProductFilters';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import apiClient from '@/lib/api-client';
 import { toast } from 'sonner';
 
@@ -127,13 +128,7 @@ function SearchContent() {
             transition={{ duration: 0.3 }}
             className="mb-4"
           >
-            <button
-              onClick={() => router.back()}
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-primary-600 font-semibold transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </button>
+            <BackButton />
           </motion.div>
 
           <motion.div

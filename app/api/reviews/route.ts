@@ -80,22 +80,31 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user has purchased this product
-    const hasPurchased = await prisma.orderItem.findFirst({
-      where: {
-        productId: productId,
-        order: {
-          userId: decoded.userId,
-          status: "DELIVERED", // Only allow reviews for delivered orders
+    // Allow reviews for confirmed, processing, shipped, and delivered orders
+    // In development mode, skip purchase requirement check
+    const isDevelopment = process.env.NODE_ENV === "development";
+    
+    if (!isDevelopment) {
+      const hasPurchased = await prisma.orderItem.findFirst({
+        where: {
+          productId: productId,
+          order: {
+            userId: decoded.userId,
+            status: {
+              in: ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"]
+            }
+          },
         },
-      },
-    });
+      });
 
-    if (!hasPurchased) {
-      return errorResponse(
-        "PURCHASE_REQUIRED",
-        "You can only review products you have purchased",
-        403
-      );
+      if (!hasPurchased) {
+        return errorResponse(
+          "PURCHASE_REQUIRED",
+          `You must purchase and have your order confirmed before reviewing "${product.title}". Please complete a purchase of this item first.`,
+          403,
+          [{ field: "productId", message: "Product not purchased by user" }]
+        );
+      }
     }
 
     // Check if user already reviewed this product
@@ -111,8 +120,9 @@ export async function POST(req: NextRequest) {
     if (existingReview) {
       return errorResponse(
         "REVIEW_EXISTS",
-        "You have already reviewed this product",
-        400
+        `You have already submitted a review for "${product.title}". Each user can only review a product once. You can edit your existing review instead.`,
+        400,
+        [{ field: "productId", message: "Review already exists for this product" }]
       );
     }
 

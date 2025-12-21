@@ -21,7 +21,9 @@ import ProductDetails from '@/components/product/ProductDetails';
 import SimilarProducts from '@/components/product/SimilarProducts';
 import ProductReviews from '@/components/product/ProductReviews';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import { useCartStore } from '@/lib/stores/cart';
+import { useAuthStore } from '@/lib/stores/auth';
 import apiClient from '@/lib/api-client';
 import { toast } from 'sonner';
 import { formatPrice, formatDate } from '@/lib/utils';
@@ -73,6 +75,7 @@ export default function ProductDetailPage() {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   
   const { addItem } = useCartStore();
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     fetchProduct();
@@ -132,6 +135,12 @@ export default function ProductDetailPage() {
   };
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to cart');
+      router.push('/auth/login');
+      return;
+    }
+    
     if (!product || isAddingToCart) return;
     
     setIsAddingToCart(true);
@@ -153,6 +162,12 @@ export default function ProductDetailPage() {
   };
 
   const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please log in to add items to wishlist');
+      router.push('/auth/login');
+      return;
+    }
+    
     try {
       if (isWishlisted) {
         await apiClient.delete(`/wishlist/${productId}`);
@@ -208,13 +223,12 @@ export default function ProductDetailPage() {
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
           <p className="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
-          <Button
-            onClick={() => router.push('/products')}
+          <BackButton 
+            href="/products" 
+            label="Back to Products"
+            variant="default"
             className="bg-primary-600 hover:bg-primary-700 text-white font-semibold border-2 border-primary-600 rounded-lg px-6 py-2"
-          >
-            <ChevronLeft className="w-4 h-4 mr-2" />
-            Back to Products
-          </Button>
+          />
         </motion.div>
       </div>
     );
@@ -222,28 +236,36 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumbs */}
+      {/* Breadcrumbs with Back Button */}
       <div className="bg-white border-b border-gray-300">
         <div className="max-w-screen-xl mx-auto px-4 py-3">
-          <motion.nav
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-xs text-gray-600"
-          >
-            <Link href="/" className="hover:text-primary-600 hover:underline">
-              Home
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link href="/products" className="hover:text-primary-600 hover:underline">
-              Products
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link href={`/products?category=${product.category}`} className="hover:text-primary-600 hover:underline">
-              {product.category}
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-gray-900">{product.name}</span>
-          </motion.nav>
+          <div className="flex items-center justify-between">
+            <motion.nav
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 text-xs text-gray-600"
+            >
+              <Link href="/" className="hover:text-primary-600 hover:underline">
+                Home
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+              <Link href="/products" className="hover:text-primary-600 hover:underline">
+                Products
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+              <Link href={`/products?category=${product.category}`} className="hover:text-primary-600 hover:underline">
+                {product.category}
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-gray-900">{product.name}</span>
+            </motion.nav>
+            <BackButton 
+              href="/products" 
+              label="Back to Products"
+              variant="ghost"
+              className="text-gray-600 hover:text-primary-600"
+            />
+          </div>
         </div>
       </div>
 
@@ -358,18 +380,28 @@ export default function ProductDetailPage() {
                 </div>
               </div>
               
-              {/* Add to Cart Button */}
-              <button
-                onClick={handleAddToCart}
-                disabled={!product.is_available}
-                className="w-full md:w-96 h-12 bg-secondary-500 text-white hover:bg-secondary-600 hover:text-white duration-300 rounded-lg mt-5 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                Add to cart
-              </button>
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-5">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!product.is_available || isAddingToCart}
+                  className="flex-1 h-12 bg-secondary-500 text-white hover:bg-secondary-600 hover:text-white duration-300 rounded-lg text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+                </button>
+                
+                <Button
+                  onClick={() => router.push('/cart')}
+                  variant="outline"
+                  className="flex-1 h-12 border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white font-semibold rounded-lg"
+                >
+                  Go to Cart
+                </Button>
+              </div>
               
               {/* Additional Actions */}
-              <div className="flex gap-3 mt-3">
+              <div className="flex gap-3 mt-5">
                 <button
                   onClick={handleShare}
                   className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary-600 transition-colors"

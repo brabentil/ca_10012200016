@@ -12,7 +12,14 @@ export async function POST(request: NextRequest) {
     const refreshToken = request.cookies.get('refreshToken')?.value;
 
     if (!refreshToken) {
-      return authErrorResponse('Refresh token is required');
+      // Return 401 without error message for silent handling
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'NO_REFRESH_TOKEN' },
+        },
+        { status: 401 }
+      );
     }
 
     // Verify refresh token

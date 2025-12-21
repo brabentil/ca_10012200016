@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowLeft,
   MapPin,
   Clock,
   Package,
@@ -15,6 +14,7 @@ import {
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/ui/back-button';
 import { Card } from '@/components/ui/card';
 import OrderStatusBadge from '@/components/checkout/OrderStatusBadge';
 import DeliveryTracker from '@/components/checkout/DeliveryTracker';
