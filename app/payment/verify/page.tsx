@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useCartStore } from '@/lib/stores/cart';
 
 type VerificationStatus = 'verifying' | 'success' | 'failed';
 
-export default function PaymentVerifyPage() {
+function PaymentVerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<VerificationStatus>('verifying');
@@ -109,5 +109,24 @@ export default function PaymentVerifyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentVerifyPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+          <div className="flex flex-col items-center text-center">
+            <Loader2 className="h-16 w-16 text-blue-600 animate-spin mb-4" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Loading...
+            </h1>
+          </div>
+        </div>
+      </div>
+    }>
+      <PaymentVerifyContent />
+    </Suspense>
   );
 }
