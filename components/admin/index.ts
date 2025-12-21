@@ -1,3 +1,4 @@
+export { default as AdminLayout } from './AdminLayout';
 export { default as OrderStatusUpdater } from './OrderStatusUpdater';
 export { default as RiderAvailabilityToggle } from './RiderAvailabilityToggle';
 export { default as ProductTable } from './ProductTable';
