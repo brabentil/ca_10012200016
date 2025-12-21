@@ -74,6 +74,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Handle client-side mount to avoid hydration mismatch
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -397,18 +403,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
       {/* Main Content */}
       <main
-        className={`
-          min-h-screen transition-all duration-300
-          lg:ml-${sidebarOpen ? '64' : '20'}
-          pt-16 lg:pt-0
-        `}
+        className="min-h-screen pt-16 lg:pt-0 transition-all duration-300"
         style={{
-          marginLeft: typeof window !== 'undefined' && window.innerWidth >= 1024 
-            ? sidebarOpen ? '256px' : '80px' 
-            : '0',
+          marginLeft: mounted ? (sidebarOpen ? '256px' : '80px') : '0',
         }}
       >
-        <div className="p-6">
+        <div className="p-6 lg:ml-0">
           {children}
         </div>
       </main>
