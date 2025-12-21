@@ -13,12 +13,12 @@ import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, ShoppingCart, Check, Shield, Sparkles, Gift, TrendingUp } from 'lucide-react';
 
 const registerSchema = z.object({
-  first_name: z.string().min(2, 'First name must be at least 2 characters'),
-  last_name: z.string().min(2, 'Last name must be at least 2 characters'),
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string().min(6, 'Please confirm your password'),
-  phone_number: z.string().optional(),
+  phone: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -88,38 +88,38 @@ export default function RegisterPage() {
           >
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="first_name" className="text-sm font-semibold text-gray-700">First name</Label>
+                <Label htmlFor="firstName" className="text-sm font-semibold text-gray-700">First name</Label>
                 <Input
-                  id="first_name"
+                  id="firstName"
                   type="text"
                   placeholder="John"
-                  {...register('first_name')}
+                  {...register('firstName')}
                   className={`h-11 border-2 transition-all ${
-                    errors.first_name 
+                    errors.firstName 
                       ? 'border-red-500 focus-visible:ring-red-500' 
                       : 'border-gray-200 hover:border-gray-300 focus-visible:border-primary-500 focus-visible:ring-primary-500'
                   }`}
                 />
-                {errors.first_name && (
-                  <p className="text-xs text-red-600">{errors.first_name.message}</p>
+                {errors.firstName && (
+                  <p className="text-xs text-red-600">{errors.firstName.message}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="last_name" className="text-sm font-semibold text-gray-700">Last name</Label>
+                <Label htmlFor="lastName" className="text-sm font-semibold text-gray-700">Last name</Label>
                 <Input
-                  id="last_name"
+                  id="lastName"
                   type="text"
                   placeholder="Doe"
-                  {...register('last_name')}
+                  {...register('lastName')}
                   className={`h-11 border-2 transition-all ${
-                    errors.last_name 
+                    errors.lastName 
                       ? 'border-red-500 focus-visible:ring-red-500' 
                       : 'border-gray-200 hover:border-gray-300 focus-visible:border-primary-500 focus-visible:ring-primary-500'
                   }`}
                 />
-                {errors.last_name && (
-                  <p className="text-xs text-red-600">{errors.last_name.message}</p>
+                {errors.lastName && (
+                  <p className="text-xs text-red-600">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
@@ -147,14 +147,14 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone_number" className="text-sm font-semibold text-gray-700">
+              <Label htmlFor="phone" className="text-sm font-semibold text-gray-700">
                 Phone number <span className="text-gray-400 font-normal">(optional)</span>
               </Label>
               <Input
-                id="phone_number"
+                id="phone"
                 type="tel"
                 placeholder="+233 XX XXX XXXX"
-                {...register('phone_number')}
+                {...register('phone')}
                 className="h-11 border-2 border-gray-200 hover:border-gray-300 focus-visible:border-primary-500 transition-all"
               />
             </div>

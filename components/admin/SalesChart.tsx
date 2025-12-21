@@ -197,7 +197,9 @@ export default function SalesChart({
           animate={{ opacity: 1, y: 0 }}
           className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
         >
-          <p className="text-sm text-gray-600 font-medium">Total Sales</p>
+          <p className="text-sm text-gray-600 font-medium">
+            {groupBy === 'daily' ? 'Sales (Period)' : groupBy === 'weekly' ? 'Sales (Week)' : 'Sales (Month)'}
+          </p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
             GH₵{totalSales.toFixed(2)}
           </p>
@@ -209,7 +211,9 @@ export default function SalesChart({
           transition={{ delay: 0.1 }}
           className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
         >
-          <p className="text-sm text-gray-600 font-medium">Total Orders</p>
+          <p className="text-sm text-gray-600 font-medium">
+            {groupBy === 'daily' ? 'Orders (Period)' : groupBy === 'weekly' ? 'Orders (Week)' : 'Orders (Month)'}
+          </p>
           <p className="text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
         </motion.div>
 

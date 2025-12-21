@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Fetch orders within date range (only completed orders)
+    // Fetch orders within date range (all orders except cancelled)
     const orders = await prisma.order.findMany({
       where: {
         createdAt: {
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
           lte: endOfDay(dateTo),
         },
         status: {
-          in: ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"],
+          not: "CANCELLED",
         },
       },
       select: {
