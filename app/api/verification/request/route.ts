@@ -38,18 +38,37 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse('Invalid input data', errors);
     }
 
-    const { eduEmail, studentId, campus } = validation.data;
+    const { studentId, campus } = validation.data;
 
-    // Check if eduEmail is already used
+    // Get user's registered email
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    if (!user) {
+      return authErrorResponse('User not found');
+    }
+
+    const eduEmail = user.email;
+
+    // Validate email is .edu.gh domain
+    if (!eduEmail.endsWith('.edu.gh')) {
+      return validationErrorResponse('Invalid email', [
+        { field: 'email', message: 'You must register with a .edu.gh email address to verify student status' }
+      ]);
+    }
+
+    // Check if already has verification request
     const existingVerification = await prisma.studentVerification.findFirst({
       where: {
-        eduEmail,
+        userId,
         status: { in: ['PENDING', 'VERIFIED'] },
       },
     });
 
     if (existingVerification) {
-      return conflictErrorResponse('Educational email already in use');
+      return conflictErrorResponse('Verification request already exists');
     }
 
     // Generate 6-digit verification code

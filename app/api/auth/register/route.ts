@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { registerSchema } from '@/lib/validation';
@@ -13,10 +13,12 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('[Register] Received body:', JSON.stringify(body, null, 2));
 
     // Validate request body
     const validation = registerSchema.safeParse(body);
     if (!validation.success) {
+      console.error('[Register] Validation failed:', JSON.stringify(validation.error.issues, null, 2));
       const errors = validation.error.issues.map((err) => ({
         field: err.path.join('.'),
         message: err.message,
@@ -24,6 +26,7 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse('Invalid input data', errors);
     }
 
+    console.log('[Register] Validation passed');
     const { email, password, firstName, lastName, phone } = validation.data;
 
     // Check if user already exists
@@ -32,6 +35,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
+      console.log('[Register] Email already exists:', email);
       return conflictErrorResponse('Email already registered');
     }
 
@@ -72,15 +76,39 @@ export async function POST(request: NextRequest) {
       role: user.role,
     });
 
-    return successResponse(
+    // Create response with cookies
+    const response = NextResponse.json(
       {
-        user,
-        accessToken,
-        refreshToken,
+        success: true,
+        data: {
+          user,
+          accessToken,
+          refreshToken,
+        },
+        message: 'User registered successfully',
       },
-      'User registered successfully',
-      201
+      { status: 201 }
     );
+
+    // Set httpOnly cookies
+    response.cookies.set('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 15, // 15 minutes
+      path: '/',
+    });
+
+    response.cookies.set('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    });
+
+    console.log('[Register] User created successfully:', user.email);
+    return response;
   } catch (error) {
     console.error('Registration error:', error);
     return internalServerErrorResponse('Failed to register user');

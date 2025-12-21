@@ -31,12 +31,6 @@ const CAMPUS_OPTIONS = [
 ];
 
 const verificationSchema = z.object({
-  eduEmail: z
-    .string()
-    .email('Invalid email format')
-    .refine((email) => email.endsWith('.edu.gh'), {
-      message: 'Email must be a valid .edu.gh email address',
-    }),
   studentId: z.string().min(1, 'Student ID is required'),
   campus: z.string().min(1, 'Campus is required'),
 });
@@ -62,9 +56,9 @@ export default function StudentVerificationPage() {
       const response = await apiClient.post('/verification/request', data);
 
       if (response.data.success) {
-        toast.success('Verification code sent! Check your email.');
-        // Redirect to verify page with eduEmail
-        router.push(`/verify?email=${encodeURIComponent(data.eduEmail)}`);
+        toast.success('Verification code sent! Check your registered email.');
+        // Redirect to verify page
+        router.push('/verify');
       }
     } catch (error: any) {
       const message = error.response?.data?.error?.message || 'Failed to send verification code. Please try again.';
@@ -107,31 +101,6 @@ export default function StudentVerificationPage() {
             {/* Verification Form */}
             <Card className="p-6 sm:p-8 border-2 border-gray-200 shadow-xl">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Educational Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="eduEmail" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-primary-600" />
-                    Educational Email
-                  </Label>
-                  <Input
-                    id="eduEmail"
-                    type="email"
-                    placeholder="your.name@ug.edu.gh"
-                    {...register('eduEmail')}
-                    className={`h-11 border-2 transition-all ${
-                      errors.eduEmail
-                        ? 'border-red-500 focus-visible:ring-red-500'
-                        : 'border-gray-200 hover:border-gray-300 focus-visible:border-primary-500'
-                    }`}
-                  />
-                  {errors.eduEmail && (
-                    <p className="text-sm text-red-600">{errors.eduEmail.message}</p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    Must be a valid .edu.gh email address
-                  </p>
-                </div>
-
                 {/* Student ID */}
                 <div className="space-y-2">
                   <Label htmlFor="studentId" className="text-sm font-semibold text-gray-700 flex items-center gap-2">

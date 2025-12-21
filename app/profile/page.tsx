@@ -37,13 +37,36 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, logout, setUser } = useAuthStore();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  // Fetch fresh user data including verification status
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await apiClient.get('/auth/me');
+        if (response.data.success && response.data.data) {
+          setUser(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+
+    if (user) {
+      fetchUserData();
+    } else {
+      setIsLoadingUser(false);
+    }
+  }, [setUser]);
 
   useEffect(() => {
     // Redirect to login if not authenticated
-    if (!user) {
+    if (!user && !isLoadingUser) {
       router.push('/login');
     }
-  }, [user, router]);
+  }, [user, router, isLoadingUser]);
 
   const {
     register,

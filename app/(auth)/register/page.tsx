@@ -15,7 +15,12 @@ import { Eye, EyeOff, ShoppingCart, Check, Shield, Sparkles, Gift, TrendingUp } 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
+  email: z
+    .string()
+    .email('Invalid email address')
+    .refine((email) => email.endsWith('.edu.gh'), {
+      message: 'Must be a valid .edu.gh student email',
+    }),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string().min(6, 'Please confirm your password'),
   phone: z.string().optional(),

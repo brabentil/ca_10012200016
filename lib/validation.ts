@@ -4,15 +4,16 @@ import { z } from 'zod';
  * User Registration Schema
  */
 export const registerSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z
+  email: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
+    .email('Invalid email format')
+    .refine((email) => email.endsWith('.edu.gh'), {
+      message: 'Email must be a valid .edu.gh email address',
+    }),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  phone: z.string().regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number format'),
+  phone: z.string().regex(/^\+?[0-9]{10,15}$/, 'Invalid phone number format').optional().or(z.literal('')),
 });
 
 /**
@@ -36,12 +37,6 @@ export const updateProfileSchema = z.object({
  * Student Verification Request Schema
  */
 export const verificationRequestSchema = z.object({
-  eduEmail: z
-    .string()
-    .email('Invalid email format')
-    .refine((email) => email.endsWith('.edu.gh'), {
-      message: 'Email must be a valid .edu.gh email address',
-    }),
   studentId: z.string().min(1, 'Student ID is required'),
   campus: z.string().min(1, 'Campus is required'),
 });

@@ -14,6 +14,7 @@ import { ShoppingCart, Mail, CheckCircle2, Shield, Sparkles, Gift, Clock } from 
 import { apiClient } from '@/lib/api-client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 
 const verifySchema = z.object({
   code: z.string().length(6, 'Verification code must be 6 digits'),
@@ -23,9 +24,9 @@ type VerifyFormData = z.infer<typeof verifySchema>;
 
 function VerifyContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const email = searchParams.get('email') || '';
+  const { user } = useAuth();
+  const email = user?.email || '';
 
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
@@ -80,14 +81,9 @@ function VerifyContent() {
       setIsResending(true);
       setVerifyError(null);
 
-      const response = await apiClient.post('/verification/request', {
-        email,
-      });
-
-      if (response.data.success) {
-        toast.success('Verification code sent! Check your email.');
-        setResendCooldown(60); // 60 second cooldown
-      }
+      // Note: API needs studentId and campus to resend, redirecting to student verification page
+      router.push('/student-verification');
+      toast.info('Please enter your student details to request a new code.');
     } catch (error: any) {
       const message = error.response?.data?.error?.message || 'Failed to resend code. Please try again.';
       toast.error(message);

@@ -36,7 +36,7 @@ export function useAuth() {
     onSuccess: (data) => {
       if (data.success && data.data?.user) {
         storeLogin(data.data.user);
-        router.push('/verify');
+        router.push('/student-verification');
       }
     },
   });
