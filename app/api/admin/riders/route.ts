@@ -21,6 +21,90 @@ async function verifyAuthToken(request: NextRequest) {
 }
 
 /**
+ * GET /api/admin/riders
+ * Fetch all campus riders (Admin only)
+ */
+export async function GET(request: NextRequest) {
+  try {
+    // Verify authentication
+    const authResult = await verifyAuthToken(request);
+    if (!authResult.valid || !authResult.payload) {
+      return errorResponse('Unauthorized', 'UNAUTHORIZED', 401);
+    }
+
+    const userRole = authResult.payload.role;
+
+    // Verify admin role
+    if (userRole !== 'ADMIN') {
+      return errorResponse('Access denied. Admin role required', 'FORBIDDEN', 403);
+    }
+
+    // Fetch all riders with related data
+    const riders = await prisma.campusRider.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            role: true,
+          },
+        },
+        zone: {
+          include: {
+            campus: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Format the response
+    const formattedRiders = riders.map((rider) => ({
+      id: rider.id,
+      userId: rider.userId,
+      user: {
+        id: rider.user.id,
+        email: rider.user.email,
+        name: `${rider.user.firstName} ${rider.user.lastName}`,
+        phone: rider.user.phone,
+        role: rider.user.role,
+      },
+      zone: {
+        id: rider.zone.id,
+        code: rider.zone.code,
+        name: rider.zone.name,
+        campus: {
+          id: rider.zone.campus.id,
+          code: rider.zone.campus.code,
+          name: rider.zone.campus.name,
+        },
+      },
+      isAvailable: rider.isAvailable,
+      rating: rider.rating,
+      totalDeliveries: rider.totalDeliveries,
+      createdAt: rider.createdAt.toISOString(),
+    }));
+
+    return successResponse(
+      formattedRiders,
+      'Riders fetched successfully'
+    );
+  } catch (error) {
+    console.error('Fetch riders error:', error);
+    return errorResponse(
+      error instanceof Error ? error.message : 'Failed to fetch riders',
+      'FETCH_RIDERS_ERROR',
+      500
+    );
+  }
+}
+
+/**
  * POST /api/admin/riders
  * Register a campus rider (Admin only)
  */

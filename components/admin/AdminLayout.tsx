@@ -15,7 +15,6 @@ import {
   ChevronLeft,
   LogOut,
   Settings,
-  BarChart3,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/auth';
 import { toast } from 'sonner';
@@ -55,11 +54,6 @@ const navItems: NavItem[] = [
     name: 'Users',
     href: '/admin/users',
     icon: Users,
-  },
-  {
-    name: 'Analytics',
-    href: '/admin/analytics',
-    icon: BarChart3,
   },
 ];
 

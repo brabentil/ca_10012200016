@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         firstName,
         lastName,
-        phone,
+        phone: phone || null,
         role: 'STUDENT',
       },
       select: {
