@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAccessToken } from './lib/auth';
+import { verifyAccessToken } from './lib/auth-edge';
 
 /**
  * Protected routes that require authentication
@@ -19,14 +19,14 @@ const protectedRoutes = [
 /**
  * Admin-only routes
  */
-const adminRoutes = ['/api/admin'];
+const adminRoutes = ['/api/admin', '/api/upload'];
 
 /**
  * Rider-only routes
  */
 const riderRoutes = ['/api/deliveries/rider'];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const { method } = request;
 
@@ -48,11 +48,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Get token from Authorization header
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+  // Get token from cookies
+  const token = request.cookies.get('accessToken')?.value;
+
+  // Debug logging
+  console.log('[Middleware] Path:', pathname);
+  console.log('[Middleware] Token exists:', !!token);
+  if (token) {
+    console.log('[Middleware] Token preview:', token.substring(0, 50) + '...');
+  }
 
   if (!token) {
+    console.log('[Middleware] No token found, returning 401');
     return NextResponse.json(
       {
         success: false,
@@ -67,7 +74,9 @@ export function middleware(request: NextRequest) {
 
   try {
     // Verify token
-    const payload = verifyAccessToken(token);
+    console.log('[Middleware] Attempting to verify token...');
+    const payload = await verifyAccessToken(token);
+    console.log('[Middleware] Token verified successfully, userId:', payload.userId, 'role:', payload.role);
 
     // Check admin access
     if (isAdminRoute) {
@@ -111,6 +120,7 @@ export function middleware(request: NextRequest) {
       },
     });
   } catch (error) {
+    console.log('[Middleware] Token verification failed:', error);
     return NextResponse.json(
       {
         success: false,

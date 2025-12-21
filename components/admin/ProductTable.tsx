@@ -153,7 +153,6 @@ export default function ProductTable({
     setDeletingId(productId);
     try {
       await onDelete?.(productId);
-      toast.success('Product deleted');
     } catch (error) {
       toast.error('Failed to delete product');
     } finally {
@@ -484,7 +483,7 @@ export default function ProductTable({
                     {/* Price */}
                     <TableCell>
                       <span className="font-semibold text-gray-900">
-                        GH₵{product.price.toFixed(2)}
+                        GH₵{Number(product.price).toFixed(2)}
                       </span>
                     </TableCell>
 

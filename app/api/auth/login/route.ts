@@ -64,14 +64,32 @@ export async function POST(request: NextRequest) {
     // Return user without password
     const { password: _, ...userWithoutPassword } = user;
 
-    return successResponse(
+    // Create response with httpOnly cookies
+    const response = successResponse(
       {
         user: userWithoutPassword,
-        accessToken,
-        refreshToken,
       },
       'Login successful'
     );
+
+    // Set httpOnly cookies for tokens
+    response.cookies.set('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 15, // 15 minutes
+      path: '/',
+    });
+
+    response.cookies.set('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     return internalServerErrorResponse('Failed to login');

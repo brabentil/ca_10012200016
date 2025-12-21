@@ -1,39 +1,65 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnalyticsCards, SalesChart } from '@/components/admin';
-
-// Mock data for demonstration
-const mockAnalytics = {
-  overview: {
-    totalOrders: 278,
-    totalRevenue: 125000,
-    totalUsers: 1234,
-    totalProducts: 567,
-    totalReviews: 892,
-  },
-  recentActivity: {
-    ordersLast7Days: 45,
-    newUsersLast7Days: 89,
-  },
-};
-
-const mockSalesData = [
-  { date: '2025-12-15', totalSales: 4500, orderCount: 12 },
-  { date: '2025-12-16', totalSales: 5200, orderCount: 15 },
-  { date: '2025-12-17', totalSales: 3800, orderCount: 10 },
-  { date: '2025-12-18', totalSales: 6100, orderCount: 18 },
-  { date: '2025-12-19', totalSales: 5500, orderCount: 14 },
-  { date: '2025-12-20', totalSales: 7200, orderCount: 20 },
-  { date: '2025-12-21', totalSales: 4900, orderCount: 13 },
-];
+import apiClient from '@/lib/api-client';
+import { toast } from 'sonner';
 
 /**
  * Admin Dashboard Page
  * Overview of key metrics and sales analytics
  */
 export default function AdminDashboardPage() {
-  const [groupBy, setGroupBy] = React.useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [groupBy, setGroupBy] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+  const [salesData, setSalesData] = useState<any[]>([]);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
+  const [isLoadingSales, setIsLoadingSales] = useState(true);
+
+  // Fetch analytics overview
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setIsLoadingAnalytics(true);
+        const response = await apiClient.get('/admin/analytics/overview');
+        if (response.data.success) {
+          setAnalyticsData(response.data.data);
+        }
+      } catch (error: any) {
+        console.error('Failed to load analytics:', error);
+        toast.error('Failed to load analytics data');
+      } finally {
+        setIsLoadingAnalytics(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  // Fetch sales data
+  useEffect(() => {
+    const fetchSales = async () => {
+      try {
+        setIsLoadingSales(true);
+        const response = await apiClient.get('/admin/analytics/sales', {
+          params: { groupBy },
+        });
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setSalesData(response.data.data);
+        } else {
+          setSalesData([]);
+        }
+      } catch (error: any) {
+        console.error('Failed to load sales data:', error);
+        toast.error('Failed to load sales data');
+        setSalesData([]); // Reset to empty array on error
+      } finally {
+        setIsLoadingSales(false);
+      }
+    };
+
+    fetchSales();
+  }, [groupBy]);
 
   return (
     <div className="space-y-6">
@@ -44,14 +70,15 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Analytics Cards */}
-      <AnalyticsCards data={mockAnalytics} />
+      <AnalyticsCards data={analyticsData} isLoading={isLoadingAnalytics} />
 
       {/* Sales Chart */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <SalesChart 
-          data={mockSalesData} 
+          data={salesData} 
           groupBy={groupBy}
           onGroupByChange={setGroupBy}
+          isLoading={isLoadingSales}
         />
       </div>
     </div>

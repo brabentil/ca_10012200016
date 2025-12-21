@@ -2,5 +2,6 @@ export { default as AdminLayout } from './AdminLayout';
 export { default as OrderStatusUpdater } from './OrderStatusUpdater';
 export { default as RiderAvailabilityToggle } from './RiderAvailabilityToggle';
 export { default as ProductTable } from './ProductTable';
+export { default as ProductFormModal } from './ProductFormModal';
 export { default as SalesChart } from './SalesChart';
 export { default as AnalyticsCards } from './AnalyticsCards';

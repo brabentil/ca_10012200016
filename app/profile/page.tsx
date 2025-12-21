@@ -26,9 +26,9 @@ import { apiClient } from '@/lib/api-client';
 import { toast } from 'sonner';
 
 const profileSchema = z.object({
-  first_name: z.string().min(2, 'First name must be at least 2 characters'),
-  last_name: z.string().min(2, 'Last name must be at least 2 characters'),
-  phone_number: z.string().optional(),
+  firstName: z.string().min(2, 'First name must be at least 2 characters'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  phone: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -37,7 +37,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, logout, setUser } = useAuthStore();
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
     // Redirect to login if not authenticated
@@ -54,18 +53,18 @@ export default function ProfilePage() {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      first_name: user?.first_name || '',
-      last_name: user?.last_name || '',
-      phone_number: user?.phone_number || '',
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      phone: user?.phone || '',
     },
   });
 
   useEffect(() => {
     if (user) {
       reset({
-        first_name: user.first_name,
-        last_name: user.last_name,
-        phone_number: user.phone_number || '',
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone || '',
       });
     }
   }, [user, reset]);
@@ -74,14 +73,14 @@ export default function ProfilePage() {
     try {
       setIsUpdating(true);
 
-      const response = await apiClient.patch('/users/profile', data);
+      const response = await apiClient.patch('/auth/profile', data);
 
       if (response.data.success) {
         setUser(response.data.data);
         toast.success('Profile updated successfully!');
       }
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to update profile. Please try again.';
+      const message = error.response?.data?.error?.message || 'Failed to update profile. Please try again.';
       toast.error(message);
     } finally {
       setIsUpdating(false);
@@ -89,23 +88,8 @@ export default function ProfilePage() {
   };
 
   const handleRequestVerification = async () => {
-    try {
-      setIsVerifying(true);
-
-      const response = await apiClient.post('/verification/request', {
-        email: user?.email,
-      });
-
-      if (response.data.success) {
-        toast.success('Verification email sent! Check your inbox.');
-        router.push(`/verify?email=${user?.email}`);
-      }
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to send verification email. Please try again.';
-      toast.error(message);
-    } finally {
-      setIsVerifying(false);
-    }
+    // Redirect to student verification page to collect required info
+    router.push('/student-verification');
   };
 
   const handleLogout = () => {
@@ -150,7 +134,7 @@ export default function ProfilePage() {
                 {/* Avatar */}
                 <div className="relative">
                   <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                    {user.first_name.charAt(0)}{user.last_name.charAt(0)}
+                    {user.firstName?.charAt(0) || 'U'}{user.lastName?.charAt(0) || 'U'}
                   </div>
                   <button className="absolute bottom-0 right-0 w-8 h-8 bg-secondary-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-secondary-600 transition-colors">
                     <Camera className="w-4 h-4" />
@@ -160,7 +144,7 @@ export default function ProfilePage() {
                 {/* User Info */}
                 <div className="flex-1 text-center sm:text-left">
                   <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                    {user.first_name} {user.last_name}
+                    {user.firstName} {user.lastName}
                   </h2>
                   <p className="text-gray-600 flex items-center gap-2 justify-center sm:justify-start mb-3">
                     <Mail className="w-4 h-4" />
@@ -168,7 +152,7 @@ export default function ProfilePage() {
                   </p>
 
                   {/* Verification Status */}
-                  {user.is_verified ? (
+                  {user.verification?.status === 'VERIFIED' ? (
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full">
                       <CheckCircle2 className="w-5 h-5" />
                       <span className="font-semibold text-sm">Verified Student</span>
@@ -182,10 +166,9 @@ export default function ProfilePage() {
                       <div>
                         <Button
                           onClick={handleRequestVerification}
-                          disabled={isVerifying}
                           className="bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white shadow-lg"
                         >
-                          {isVerifying ? 'Sending...' : 'Verify Student Email'}
+                          Verify Student Email
                         </Button>
                       </div>
                     </div>
@@ -227,40 +210,40 @@ export default function ProfilePage() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="first_name" className="text-sm font-semibold text-gray-700">
+                    <Label htmlFor="firstName" className="text-sm font-semibold text-gray-700">
                       First Name
                     </Label>
                     <Input
-                      id="first_name"
+                      id="firstName"
                       type="text"
-                      {...register('first_name')}
+                      {...register('firstName')}
                       className={`h-11 border-2 transition-all ${
-                        errors.first_name
+                        errors.firstName
                           ? 'border-red-500 focus-visible:ring-red-500'
                           : 'border-gray-200 hover:border-gray-300 focus-visible:border-primary-500'
                       }`}
                     />
-                    {errors.first_name && (
-                      <p className="text-sm text-red-600">{errors.first_name.message}</p>
+                    {errors.firstName && (
+                      <p className="text-sm text-red-600">{errors.firstName.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="last_name" className="text-sm font-semibold text-gray-700">
+                    <Label htmlFor="lastName" className="text-sm font-semibold text-gray-700">
                       Last Name
                     </Label>
                     <Input
-                      id="last_name"
+                      id="lastName"
                       type="text"
-                      {...register('last_name')}
+                      {...register('lastName')}
                       className={`h-11 border-2 transition-all ${
-                        errors.last_name
+                        errors.lastName
                           ? 'border-red-500 focus-visible:ring-red-500'
                           : 'border-gray-200 hover:border-gray-300 focus-visible:border-primary-500'
                       }`}
                     />
-                    {errors.last_name && (
-                      <p className="text-sm text-red-600">{errors.last_name.message}</p>
+                    {errors.lastName && (
+                      <p className="text-sm text-red-600">{errors.lastName.message}</p>
                     )}
                   </div>
                 </div>
@@ -283,16 +266,16 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone_number" className="text-sm font-semibold text-gray-700">
+                  <Label htmlFor="phone" className="text-sm font-semibold text-gray-700">
                     Phone Number <span className="text-gray-400 font-normal">(optional)</span>
                   </Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <Input
-                      id="phone_number"
+                      id="phone"
                       type="tel"
                       placeholder="+233 XX XXX XXXX"
-                      {...register('phone_number')}
+                      {...register('phone')}
                       className="h-11 pl-11 border-2 border-gray-200 hover:border-gray-300 focus-visible:border-primary-500 transition-all"
                     />
                   </div>

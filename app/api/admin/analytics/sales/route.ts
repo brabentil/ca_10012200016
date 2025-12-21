@@ -12,9 +12,9 @@ import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth,
  */
 export async function GET(req: NextRequest) {
   try {
-    // Verify authentication
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    // Verify authentication from cookie
+    const token = req.cookies.get("accessToken")?.value;
+    if (!token) {
       return errorResponse(
         "UNAUTHORIZED",
         "Authorization token required",
@@ -22,7 +22,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const token = authHeader.substring(7);
     let decoded;
     try {
       decoded = verifyAccessToken(token);

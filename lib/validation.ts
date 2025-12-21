@@ -76,6 +76,10 @@ export const createProductSchema = z.object({
   condition: z.enum(['LIKE_NEW', 'GOOD', 'FAIR', 'VINTAGE']),
   price: z.number().positive('Price must be greater than 0'),
   stock: z.number().int().min(0, 'Stock cannot be negative'),
+  images: z.array(z.object({
+    imageUrl: z.string().url('Invalid image URL'),
+    isPrimary: z.boolean(),
+  })).optional(),
 });
 
 /**

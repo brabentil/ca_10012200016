@@ -25,21 +25,10 @@ export default function CartPage() {
     setIsClearing(true);
 
     try {
-      // Get auth token from localStorage
-      const token = localStorage.getItem('accessToken');
-      
-      if (!token) {
-        toast.error('Please login to continue');
-        setIsClearing(false);
-        return;
-      }
-
-      // API call to clear cart on server
+      // API call to clear cart on server (uses httpOnly cookies for auth)
       const response = await fetch('/api/cart/clear', {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include', // Include cookies
       });
 
       if (response.ok) {
@@ -47,7 +36,8 @@ export default function CartPage() {
         clearCart();
         toast.success('Cart cleared successfully');
       } else {
-        toast.error('Failed to clear cart');
+        const errorData = await response.json();
+        toast.error(errorData.error?.message || 'Failed to clear cart');
       }
     } catch (error) {
       console.error('Error clearing cart:', error);

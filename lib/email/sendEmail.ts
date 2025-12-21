@@ -227,3 +227,94 @@ export async function sendPaymentFailureEmail(
     html,
   });
 }
+
+/**
+ * Send student verification code email
+ * @param email - Student's .edu.gh email
+ * @param code - 6-digit verification code
+ * @param expiresAt - Code expiration time
+ */
+export async function sendVerificationCodeEmail(
+  email: string,
+  code: string,
+  expiresAt: Date
+): Promise<void> {
+  const subject = 'Student Verification Code - ThriftHub';
+
+  const expiryMinutes = Math.round((expiresAt.getTime() - Date.now()) / (1000 * 60));
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #003399; color: white; padding: 20px; text-align: center; }
+        .content { padding: 30px; background-color: #f9f9f9; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+        .code-box { 
+          background-color: white; 
+          border: 2px solid #003399; 
+          border-radius: 8px; 
+          padding: 20px; 
+          text-align: center; 
+          margin: 20px 0;
+        }
+        .code { 
+          font-size: 36px; 
+          font-weight: bold; 
+          color: #003399; 
+          letter-spacing: 8px;
+          font-family: 'Courier New', monospace;
+        }
+        .warning { 
+          background-color: #fff3cd; 
+          border-left: 4px solid #ffc107; 
+          padding: 10px; 
+          margin: 15px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🎓 Student Verification</h1>
+        </div>
+        <div class="content">
+          <p>Hello,</p>
+          <p>Thank you for verifying your student status with ThriftHub! Use the verification code below to complete your verification:</p>
+          
+          <div class="code-box">
+            <p style="margin: 0; color: #666; font-size: 14px;">Your Verification Code</p>
+            <div class="code">${code}</div>
+          </div>
+
+          <div class="warning">
+            <strong>⏱️ Important:</strong> This code will expire in ${expiryMinutes} minutes.
+          </div>
+
+          <p><strong>What's next?</strong></p>
+          <ul>
+            <li>Enter this code on the verification page</li>
+            <li>Once verified, you'll get access to student-exclusive benefits</li>
+            <li>Enjoy free campus delivery and PayDay Flex payments</li>
+          </ul>
+
+          <p>If you didn't request this verification, please ignore this email.</p>
+        </div>
+        <div class="footer">
+          <p>ThriftHub - Campus Fashion Marketplace</p>
+          <p>Need help? Contact support@thrifthub.com</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  await sendEmail({
+    to: email,
+    subject,
+    html,
+  });
+}

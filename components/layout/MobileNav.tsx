@@ -142,12 +142,12 @@ export default function MobileNav() {
               >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">
-                    {user.first_name.charAt(0)}
-                    {user.last_name.charAt(0)}
+                    {user.firstName?.charAt(0) || 'U'}
+                    {user.lastName?.charAt(0) || 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-gray-900 truncate">
-                      {user.first_name} {user.last_name}
+                      {user.firstName} {user.lastName}
                     </h3>
                     <p className="text-xs text-gray-600 truncate">{user.email}</p>
                   </div>

@@ -17,8 +17,8 @@ export async function DELETE(
     const { productId } = await params;
 
     // Verify authentication
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const token = req.cookies.get("accessToken")?.value;
+    if (!token) {
       return errorResponse(
         "UNAUTHORIZED",
         "Authorization token required",
@@ -26,7 +26,6 @@ export async function DELETE(
       );
     }
 
-    const token = authHeader.substring(7);
     let decoded;
     try {
       decoded = verifyAccessToken(token);

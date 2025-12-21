@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verificationRequestSchema } from '@/lib/validation';
+import { sendVerificationCodeEmail } from '@/lib/email/sendEmail';
 import {
   successResponse,
   validationErrorResponse,
@@ -80,10 +81,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // TODO: Send verification code to eduEmail
-    // For now, we'll log it (in production, use nodemailer)
-    console.log(`Verification code for ${eduEmail}: ${verificationCode}`);
-    console.log(`Code expires at: ${expiresAt.toISOString()}`);
+    // Send verification code via email
+    try {
+      await sendVerificationCodeEmail(eduEmail, verificationCode, expiresAt);
+      console.log(`✅ Verification email sent successfully to ${eduEmail}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send verification email:', emailError);
+      // Don't fail the request if email fails - log the code for development
+      console.log(`\n⚠️  EMAIL NOT CONFIGURED - Add SMTP settings to .env.local:`);
+      console.log(`SMTP_HOST=smtp.gmail.com`);
+      console.log(`SMTP_PORT=587`);
+      console.log(`SMTP_USER=your-email@gmail.com`);
+      console.log(`SMTP_PASSWORD=your-app-password\n`);
+      console.log(`📋 Verification code for ${eduEmail}: ${verificationCode}`);
+      console.log(`⏰ Expires at: ${expiresAt.toISOString()}\n`);
+    }
 
     return successResponse(
       {

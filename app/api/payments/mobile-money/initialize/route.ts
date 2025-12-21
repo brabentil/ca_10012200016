@@ -1,9 +1,14 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { initializePaydayFlexSchema } from '@/lib/validation';
+import { z } from 'zod';
 import { successResponse, errorResponse, validationErrorResponse } from '@/lib/response';
 import { verifyAccessToken } from '@/lib/auth';
 import { initializeTransaction } from '@/lib/payment/paystack';
+
+// Schema for mobile money initialization
+const initializeMobileMoneySchema = z.object({
+  orderId: z.string().min(1, 'Order ID is required'),
+});
 
 // Helper to verify auth token from request
 async function verifyAuthToken(request: NextRequest) {
@@ -22,8 +27,8 @@ async function verifyAuthToken(request: NextRequest) {
 }
 
 /**
- * POST /api/payments/payday-flex/initialize
- * Initialize installment payment for an order
+ * POST /api/payments/mobile-money/initialize
+ * Initialize mobile money payment for an order
  */
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
-    const validationResult = initializePaydayFlexSchema.safeParse(body);
+    const validationResult = initializeMobileMoneySchema.safeParse(body);
 
     if (!validationResult.success) {
       const errors = validationResult.error.issues.map((err: any) => ({
@@ -47,7 +52,7 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse('Validation failed', errors);
     }
 
-    const { orderId, paydayDate } = validationResult.data;
+    const { orderId } = validationResult.data;
 
     // Fetch order with user verification
     const order = await prisma.order.findUnique({
@@ -72,25 +77,24 @@ export async function POST(request: NextRequest) {
       return errorResponse('Payment already exists for this order', 'PAYMENT_EXISTS', 400);
     }
 
-    // Calculate payment amounts
+    // Calculate payment amount
     const totalAmount = Number(order.totalAmount);
-    const firstPayment = totalAmount * 0.5; // 50%
-    const remainingAmount = totalAmount - firstPayment;
 
     // Generate unique payment reference
-    const paymentReference = `THB-PAY-${Date.now()}-${orderId.substring(0, 8)}`;
+    const paymentReference = `THB-MM-${Date.now()}-${orderId.substring(0, 8)}`;
 
-    // Initialize Paystack transaction for first payment
+    // Initialize Paystack transaction for mobile money
     const paystackResponse = await initializeTransaction(
       order.user.email,
-      firstPayment,
+      totalAmount,
       paymentReference,
       {
         orderId: order.id,
         orderNumber: order.orderNumber,
-        paymentType: 'INSTALLMENT_FIRST',
+        paymentType: 'MOBILE_MONEY',
         userId: order.userId,
-      }
+      },
+      ['mobile_money'] // Specify mobile money as payment channel
     );
 
     if (!paystackResponse.status) {
@@ -106,12 +110,11 @@ export async function POST(request: NextRequest) {
       data: {
         orderId: order.id,
         amount: totalAmount,
-        method: 'INSTALLMENT',
+        method: 'MOBILE_MONEY',
         status: 'PENDING',
-        installmentPlan: true,
+        installmentPlan: false,
         paidAmount: 0,
-        remainingAmount: remainingAmount,
-        paydayDate: new Date(paydayDate),
+        remainingAmount: 0,
         transactionRef: paymentReference,
       },
     });
@@ -124,16 +127,13 @@ export async function POST(request: NextRequest) {
         reference: paystackResponse.data.reference,
         payment: {
           id: payment.id,
-          totalAmount: payment.amount,
-          firstPayment: firstPayment,
-          remainingAmount: payment.remainingAmount,
-          paydayDate: payment.paydayDate,
+          amount: payment.amount,
         },
       },
       'Payment initialized successfully'
     );
   } catch (error) {
-    console.error('Initialize Payday Flex error:', error);
+    console.error('Initialize Mobile Money error:', error);
     return errorResponse(
       error instanceof Error ? error.message : 'Failed to initialize payment',
       'PAYMENT_INITIALIZATION_ERROR',

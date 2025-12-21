@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { verifyRefreshToken, signAccessToken } from '@/lib/auth';
 import {
   successResponse,
@@ -8,8 +8,8 @@ import {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { refreshToken } = body;
+    // Get refresh token from cookies instead of body
+    const refreshToken = request.cookies.get('refreshToken')?.value;
 
     if (!refreshToken) {
       return authErrorResponse('Refresh token is required');
@@ -25,12 +25,25 @@ export async function POST(request: NextRequest) {
       role: payload.role,
     });
 
-    return successResponse(
+    // Create response with success message
+    const response = NextResponse.json(
       {
-        accessToken: newAccessToken,
+        success: true,
+        message: 'Token refreshed successfully',
+        data: {},
       },
-      'Token refreshed successfully'
+      { status: 200 }
     );
+
+    // Set new access token as httpOnly cookie
+    response.cookies.set('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 15, // 15 minutes
+    });
+
+    return response;
   } catch (error) {
     console.error('Token refresh error:', error);
     return authErrorResponse('Invalid or expired refresh token');

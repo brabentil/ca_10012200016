@@ -15,9 +15,14 @@ export function useAuth() {
       return response.data;
     },
     onSuccess: (data) => {
-      if (data.success && data.user) {
-        storeLogin(data.user);
-        router.push('/');
+      if (data.success && data.data?.user) {
+        storeLogin(data.data.user);
+        // Redirect based on role
+        if (data.data.user.role === 'ADMIN') {
+          router.push('/admin');
+        } else {
+          router.push('/');
+        }
       }
     },
   });
@@ -29,8 +34,8 @@ export function useAuth() {
       return response.data;
     },
     onSuccess: (data) => {
-      if (data.success && data.user) {
-        storeLogin(data.user);
+      if (data.success && data.data?.user) {
+        storeLogin(data.data.user);
         router.push('/verify');
       }
     },
@@ -51,11 +56,16 @@ export function useAuth() {
   const { data: currentUser, isLoading: isLoadingUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await apiClient.get<{ user: User }>('/auth/me');
-      return response.data.user;
+      const response = await apiClient.get<{ success: boolean; data: User }>('/auth/me');
+      // Ensure we always return a value (throw error if no data instead of returning undefined)
+      if (!response.data.data) {
+        throw new Error('No user data received');
+      }
+      return response.data.data;
     },
     enabled: !!user,
     initialData: user || undefined,
+    retry: false,
   });
 
   return {

@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
-    // Create product
+    // Create product with images
     const product = await prisma.product.create({
       data: {
         title: data.title,
@@ -140,6 +140,12 @@ export async function POST(request: NextRequest) {
         price: data.price,
         stock: data.stock,
         isActive: true,
+        images: data.images ? {
+          create: data.images.map((img) => ({
+            imageUrl: img.imageUrl,
+            isPrimary: img.isPrimary,
+          })),
+        } : undefined,
       },
       include: {
         images: true,

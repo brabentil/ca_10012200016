@@ -89,56 +89,35 @@ const MetricCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${gradient} p-6 shadow-lg border border-white/20`}
+      className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
     >
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-          backgroundSize: '20px 20px',
-        }} />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-4">
-          <div className={`p-3 rounded-lg ${iconBg}`}>
-            {icon}
+      <div className="flex items-start justify-between mb-4">
+        <div className={`p-3 rounded-lg ${iconBg}`}>
+          {icon}
+        </div>
+        {trend && (
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
+            trend.isPositive 
+              ? 'bg-green-100 text-green-700' 
+              : 'bg-red-100 text-red-700'
+          }`}>
+            {trend.isPositive ? (
+              <TrendingUp className="w-3 h-3" />
+            ) : (
+              <TrendingDown className="w-3 h-3" />
+            )}
+            {Math.abs(trend.value)}%
           </div>
-          {trend && (
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-              trend.isPositive 
-                ? 'bg-green-100 text-green-700' 
-                : 'bg-red-100 text-red-700'
-            }`}>
-              {trend.isPositive ? (
-                <TrendingUp className="w-3 h-3" />
-              ) : (
-                <TrendingDown className="w-3 h-3" />
-              )}
-              {Math.abs(trend.value)}%
-            </div>
-          )}
-        </div>
-
-        <div>
-          <p className="text-sm font-medium text-white/80 mb-1">{title}</p>
-          <p className="text-3xl font-bold text-white mb-1">{value}</p>
-          {subtitle && (
-            <p className="text-xs text-white/70">{subtitle}</p>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Shine effect on hover */}
-      <motion.div
-        className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300"
-        style={{
-          background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
-          backgroundSize: '200% 200%',
-          animation: 'shine 3s infinite',
-        }}
-      />
+      <div>
+        <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
+        <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+        {subtitle && (
+          <p className="text-xs text-gray-500">{subtitle}</p>
+        )}
+      </div>
     </motion.div>
   );
 };
@@ -172,7 +151,7 @@ const SkeletonCard = ({ index }: { index: number }) => {
  * Dashboard overview cards with key metrics
  */
 export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCardsProps) {
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[0, 1, 2, 3].map((index) => (
@@ -201,9 +180,9 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
       title: 'Total Revenue',
       value: formatCurrency(data.overview.totalRevenue),
       subtitle: `Avg: ${formatCurrency(avgOrderValue)} per order`,
-      icon: <DollarSign className="w-6 h-6 text-emerald-600" />,
-      gradient: 'from-emerald-500 to-teal-600',
-      iconBg: 'bg-emerald-100',
+      icon: <DollarSign className="w-6 h-6 text-primary-600" />,
+      gradient: 'from-primary-500 to-primary-700',
+      iconBg: 'bg-primary-100',
       trend: orderTrend > 0 ? {
         value: orderTrend,
         isPositive: true,
@@ -213,9 +192,9 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
       title: 'Total Orders',
       value: formatNumber(data.overview.totalOrders),
       subtitle: `${data.recentActivity.ordersLast7Days} in last 7 days`,
-      icon: <ShoppingBag className="w-6 h-6 text-blue-600" />,
-      gradient: 'from-blue-500 to-indigo-600',
-      iconBg: 'bg-blue-100',
+      icon: <ShoppingBag className="w-6 h-6 text-primary-600" />,
+      gradient: 'from-primary-400 to-primary-600',
+      iconBg: 'bg-primary-100',
       trend: data.recentActivity.ordersLast7Days > 0 ? {
         value: data.recentActivity.ordersLast7Days,
         isPositive: true,
@@ -225,9 +204,9 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
       title: 'Total Users',
       value: formatNumber(data.overview.totalUsers),
       subtitle: `${data.recentActivity.newUsersLast7Days} new this week`,
-      icon: <Users className="w-6 h-6 text-purple-600" />,
-      gradient: 'from-purple-500 to-pink-600',
-      iconBg: 'bg-purple-100',
+      icon: <Users className="w-6 h-6 text-primary-700" />,
+      gradient: 'from-primary-600 to-primary-800',
+      iconBg: 'bg-primary-100',
       trend: userTrend > 0 ? {
         value: userTrend,
         isPositive: true,
@@ -237,8 +216,8 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
       title: 'Active Products',
       value: formatNumber(data.overview.totalProducts),
       subtitle: `${data.overview.totalReviews} reviews`,
-      icon: <Package className="w-6 h-6 text-orange-600" />,
-      gradient: 'from-orange-500 to-red-600',
+      icon: <Package className="w-6 h-6 text-accent-dark" />,
+      gradient: 'from-accent to-accent-dark',
       iconBg: 'bg-orange-100',
     },
   ];
@@ -266,8 +245,8 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Activity className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-primary-50 rounded-lg">
+                <Activity className="w-5 h-5 text-primary-600" />
               </div>
               <div>
                 <p className="text-xs text-gray-600">Recent Orders</p>
@@ -290,8 +269,8 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <Users className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-primary-50 rounded-lg">
+                <Users className="w-5 h-5 text-primary-600" />
               </div>
               <div>
                 <p className="text-xs text-gray-600">New Users</p>
@@ -314,8 +293,8 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-50 rounded-lg">
-                <Star className="w-5 h-5 text-amber-600" />
+              <div className="p-2 bg-orange-50 rounded-lg">
+                <Star className="w-5 h-5 text-orange-600" />
               </div>
               <div>
                 <p className="text-xs text-gray-600">Total Reviews</p>
@@ -336,7 +315,7 @@ export default function AnalyticsCards({ data, isLoading = false }: AnalyticsCar
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
-        className="p-4 bg-gradient-to-r from-[#003399] to-[#0055cc] rounded-lg shadow-lg"
+        className="p-6 bg-[#003399] rounded-lg shadow-sm"
       >
         <div className="flex items-center justify-between text-white">
           <div>

@@ -92,13 +92,15 @@ export interface PaystackWebhookEvent {
  * @param amount - Amount in kobo (multiply GHS by 100)
  * @param reference - Unique transaction reference
  * @param metadata - Additional transaction data
+ * @param channels - Payment channels to enable (e.g., ['card', 'mobile_money'])
  * @returns Payment URL and transaction reference
  */
 export async function initializeTransaction(
   email: string,
   amount: number,
   reference: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>,
+  channels?: string[]
 ): Promise<PaystackInitializeResponse> {
   try {
     const response = await axios.post<PaystackInitializeResponse>(
@@ -108,7 +110,7 @@ export async function initializeTransaction(
         amount: Math.round(amount * 100), // Convert to kobo
         reference,
         metadata,
-        channels: ['card', 'mobile_money'],
+        channels: channels || ['card', 'mobile_money'],
       },
       {
         headers: {

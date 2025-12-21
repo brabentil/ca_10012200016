@@ -102,7 +102,7 @@ export default function StudentVerificationModal({
         setResendCooldown(60); // 60 second cooldown
       }
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to resend code. Please try again.';
+      const message = error.response?.data?.error?.message || 'Failed to resend code. Please try again.';
       toast.error(message);
     } finally {
       setIsResending(false);

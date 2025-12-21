@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { ShoppingCart, Mail, CheckCircle2, Shield, Sparkles, Gift, Clock } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 const verifySchema = z.object({
   code: z.string().length(6, 'Verification code must be 6 digits'),
@@ -23,6 +24,7 @@ type VerifyFormData = z.infer<typeof verifySchema>;
 function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const email = searchParams.get('email') || '';
 
   const [isVerifying, setIsVerifying] = useState(false);
@@ -52,19 +54,20 @@ function VerifyContent() {
       setVerifyError(null);
 
       const response = await apiClient.post('/verification/verify', {
-        email,
-        code: data.code,
+        verificationCode: data.code,
       });
 
       if (response.data.success) {
         toast.success('Email verified successfully!');
+        // Invalidate user query to refetch updated verification status
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
         // Redirect to profile or dashboard after successful verification
         setTimeout(() => {
           router.push('/profile');
         }, 1500);
       }
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Verification failed. Please check your code and try again.';
+      const message = error.response?.data?.error?.message || 'Verification failed. Please check your code and try again.';
       setVerifyError(message);
       toast.error(message);
     } finally {
@@ -86,7 +89,7 @@ function VerifyContent() {
         setResendCooldown(60); // 60 second cooldown
       }
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to resend code. Please try again.';
+      const message = error.response?.data?.error?.message || 'Failed to resend code. Please try again.';
       toast.error(message);
     } finally {
       setIsResending(false);

@@ -13,8 +13,8 @@ import { AppError } from "@/lib/errors";
 export async function POST(req: NextRequest) {
   try {
     // Verify authentication
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const token = req.cookies.get("accessToken")?.value;
+    if (!token) {
       return errorResponse(
         "UNAUTHORIZED",
         "Authorization token required",
@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const token = authHeader.substring(7);
     let decoded;
     try {
       decoded = verifyAccessToken(token);

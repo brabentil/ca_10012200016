@@ -195,10 +195,10 @@ export default function SalesChart({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200"
+          className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
         >
-          <p className="text-sm text-blue-700 font-medium">Total Sales</p>
-          <p className="text-2xl font-bold text-blue-900 mt-1">
+          <p className="text-sm text-gray-600 font-medium">Total Sales</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">
             GH₵{totalSales.toFixed(2)}
           </p>
         </motion.div>
@@ -207,20 +207,20 @@ export default function SalesChart({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200"
+          className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
         >
-          <p className="text-sm text-green-700 font-medium">Total Orders</p>
-          <p className="text-2xl font-bold text-green-900 mt-1">{totalOrders}</p>
+          <p className="text-sm text-gray-600 font-medium">Total Orders</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200"
+          className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm"
         >
-          <p className="text-sm text-purple-700 font-medium">Avg Order Value</p>
-          <p className="text-2xl font-bold text-purple-900 mt-1">
+          <p className="text-sm text-gray-600 font-medium">Avg Order Value</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">
             GH₵{averageOrderValue.toFixed(2)}
           </p>
         </motion.div>

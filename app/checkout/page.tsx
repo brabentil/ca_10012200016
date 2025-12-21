@@ -123,22 +123,13 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      // Get auth token from localStorage or cookies
-      const token = localStorage.getItem('accessToken');
-      
-      if (!token) {
-        toast.error('Please login to continue');
-        setIsProcessing(false);
-        return;
-      }
-
-      // Create order
+      // Create order (uses httpOnly cookies for auth)
       const orderResponse = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include', // Include cookies
         body: JSON.stringify({
           deliveryAddress: deliveryAddress.deliveryAddress,
           campusZone: deliveryAddress.campusZone,
@@ -148,7 +139,7 @@ export default function CheckoutPage() {
 
       if (!orderResponse.ok) {
         const errorData = await orderResponse.json();
-        throw new Error(errorData.message || 'Failed to create order');
+        throw new Error(errorData.error?.message || 'Failed to create order');
       }
 
       const orderData = await orderResponse.json();
@@ -161,8 +152,8 @@ export default function CheckoutPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
           },
+          credentials: 'include',
           body: JSON.stringify({
             orderId,
             paydayDate: paydayDate.toISOString(),
@@ -171,7 +162,7 @@ export default function CheckoutPage() {
 
         if (!paymentResponse.ok) {
           const errorData = await paymentResponse.json();
-          throw new Error(errorData.message || 'Failed to initialize payment');
+          throw new Error(errorData.error?.message || 'Failed to initialize payment');
         }
 
         const paymentData = await paymentResponse.json();
@@ -186,13 +177,13 @@ export default function CheckoutPage() {
           throw new Error('No payment URL received');
         }
       } else {
-        // Mobile Money - redirect to payment page
-        const paymentResponse = await fetch('/api/payments/payday-flex/initialize', {
+        // Mobile Money - use mobile money endpoint
+        const paymentResponse = await fetch('/api/payments/mobile-money/initialize', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({
             orderId,
           }),
@@ -200,7 +191,7 @@ export default function CheckoutPage() {
 
         if (!paymentResponse.ok) {
           const errorData = await paymentResponse.json();
-          throw new Error(errorData.message || 'Failed to initialize payment');
+          throw new Error(errorData.error?.message || 'Failed to initialize payment');
         }
 
         const paymentData = await paymentResponse.json();

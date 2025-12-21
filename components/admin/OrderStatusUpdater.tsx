@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Loader2, AlertCircle, Package } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Order status options
+// Order status options (must match Prisma OrderStatus enum)
 const ORDER_STATUSES = [
+  { value: 'PENDING', label: 'Pending', color: 'text-gray-600' },
   { value: 'CONFIRMED', label: 'Confirmed', color: 'text-blue-600' },
   { value: 'PROCESSING', label: 'Processing', color: 'text-yellow-600' },
   { value: 'SHIPPED', label: 'Shipped', color: 'text-orange-600' },

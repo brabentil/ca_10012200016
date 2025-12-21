@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Building2, Home, AlertCircle, CheckCircle } from 'lucide-react';
+import { MapPin, Building2, Home, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
+import apiClient from '@/lib/api-client';
+import { useAuthStore } from '@/lib/stores/auth';
 
 interface CampusZone {
   id: string;
@@ -29,25 +31,62 @@ export interface DeliveryAddressData {
   deliveryAddress: string; // Complete formatted address
 }
 
-// Mock campus zones - in production, fetch from API
-const CAMPUS_ZONES: CampusZone[] = [
-  { id: '1', code: 'ZONE_A', name: 'Zone A - Main Campus', description: 'Central campus area', deliveryFee: 0 },
-  { id: '2', code: 'ZONE_B', name: 'Zone B - North Campus', description: 'Northern residential area', deliveryFee: 5 },
-  { id: '3', code: 'ZONE_C', name: 'Zone C - South Campus', description: 'Southern residential area', deliveryFee: 5 },
-  { id: '4', code: 'ZONE_D', name: 'Zone D - East Campus', description: 'Eastern residential area', deliveryFee: 8 },
-  { id: '5', code: 'ZONE_E', name: 'Zone E - West Campus', description: 'Western residential area', deliveryFee: 8 },
-];
-
 export default function DeliveryAddressForm({ 
   onAddressChange, 
   initialData 
 }: DeliveryAddressFormProps) {
+  const { user } = useAuthStore();
+  const [zones, setZones] = useState<CampusZone[]>([]);
+  const [isLoadingZones, setIsLoadingZones] = useState(true);
   const [selectedZone, setSelectedZone] = useState<string>(initialData?.campusZone || '');
   const [dormName, setDormName] = useState(initialData?.dormName || '');
   const [roomNumber, setRoomNumber] = useState(initialData?.roomNumber || '');
   const [additionalInfo, setAdditionalInfo] = useState(initialData?.additionalInfo || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isValid, setIsValid] = useState(false);
+
+  // Fetch campus zones based on user's verified campus
+  useEffect(() => {
+    const fetchZones = async () => {
+      try {
+        setIsLoadingZones(true);
+        
+        // Get user's campus from verification
+        const userCampus = user?.verification?.campus;
+        
+        if (!userCampus) {
+          // If no verified campus, show generic zones as fallback
+          setZones([
+            { id: '1', code: 'MAIN', name: 'Main Campus', description: 'Central campus area', deliveryFee: 5 },
+          ]);
+          setIsLoadingZones(false);
+          return;
+        }
+
+        // Fetch zones for the user's campus
+        const response = await apiClient.get(`/campus/zones?campus=${encodeURIComponent(userCampus)}`);
+        
+        if (response.data.success && response.data.data) {
+          setZones(response.data.data);
+        } else {
+          // Fallback to generic zone
+          setZones([
+            { id: '1', code: 'MAIN', name: 'Main Campus', description: 'Central campus area', deliveryFee: 5 },
+          ]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch campus zones:', error);
+        // Fallback to generic zone
+        setZones([
+          { id: '1', code: 'MAIN', name: 'Main Campus', description: 'Central campus area', deliveryFee: 5 },
+        ]);
+      } finally {
+        setIsLoadingZones(false);
+      }
+    };
+
+    fetchZones();
+  }, [user?.verification?.campus]);
 
   // Validate form and update parent
   useEffect(() => {
@@ -69,7 +108,7 @@ export default function DeliveryAddressForm({
 
     // Only call parent if form is valid
     if (formIsValid) {
-      const zone = CAMPUS_ZONES.find(z => z.code === selectedZone);
+      const zone = zones.find(z => z.code === selectedZone);
       const fullAddress = `${dormName}, Room ${roomNumber}, ${zone?.name || selectedZone}${additionalInfo ? ` - ${additionalInfo}` : ''}`;
       
       onAddressChange({
@@ -81,9 +120,23 @@ export default function DeliveryAddressForm({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedZone, dormName, roomNumber, additionalInfo]);
+  }, [selectedZone, dormName, roomNumber, additionalInfo, zones]);
 
-  const selectedZoneData = CAMPUS_ZONES.find(z => z.code === selectedZone);
+  const selectedZoneData = zones.find(z => z.code === selectedZone);
+
+  if (isLoadingZones) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-primary-600" />
+          <h3 className="text-lg font-bold text-gray-900">Delivery Address</h3>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -103,7 +156,7 @@ export default function DeliveryAddressForm({
             Campus Zone *
           </Label>
           <div className="grid grid-cols-1 gap-3">
-            {CAMPUS_ZONES.map((zone, index) => (
+            {zones.map((zone, index) => (
               <motion.div
                 key={zone.code}
                 initial={{ opacity: 0, x: -10 }}
@@ -299,26 +352,7 @@ export default function DeliveryAddressForm({
         )}
       </motion.div>
 
-      {/* Delivery Information Notice */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg"
-      >
-        <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-        <div className="flex-1">
-          <p className="text-sm text-blue-900 font-semibold mb-1">
-            Campus Delivery Information
-          </p>
-          <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
-            <li>Deliveries are made during business hours (8 AM - 6 PM)</li>
-            <li>Please ensure someone is available to receive the package</li>
-            <li>Delivery fees vary by campus zone location</li>
-            <li>Our campus riders will contact you 10 minutes before arrival</li>
-          </ul>
-        </div>
-      </motion.div>
+
     </div>
   );
 }

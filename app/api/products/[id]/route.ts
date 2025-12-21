@@ -97,10 +97,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return validationErrorResponse('Invalid input data', errors);
     }
 
-    // Update product
+    const data = validation.data;
+
+    // Update product with images
     const updatedProduct = await prisma.product.update({
       where: { id },
-      data: validation.data,
+      data: {
+        ...data,
+        images: data.images ? {
+          deleteMany: {}, // Remove existing images
+          create: data.images.map((img) => ({
+            imageUrl: img.imageUrl,
+            isPrimary: img.isPrimary,
+          })),
+        } : undefined,
+      },
       include: {
         images: true,
       },

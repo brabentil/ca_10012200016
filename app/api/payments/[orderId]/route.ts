@@ -5,8 +5,7 @@ import { verifyAccessToken } from '@/lib/auth';
 
 // Helper to verify auth token from request
 async function verifyAuthToken(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+  const token = request.cookies.get('accessToken')?.value;
   
   if (!token) {
     return { valid: false, payload: null };
