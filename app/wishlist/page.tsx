@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Trash2, ShoppingCart, Loader2 } from 'lucide-react';
+import { Heart, Trash2, ShoppingCart, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import BackButton from '@/components/ui/back-button';
