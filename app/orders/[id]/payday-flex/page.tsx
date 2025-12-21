@@ -451,7 +451,6 @@ export default function PaydayFlexDetailsPage() {
               onClick={() => router.push('/orders')}
               variant="outline"
               className="flex-1 h-12 text-base border-2"
-              onClick={() => router.push('/orders')}
             >
               Back to Orders
             </Button>
