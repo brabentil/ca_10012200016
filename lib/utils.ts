@@ -19,3 +19,11 @@ export function formatDate(date: string | Date): string {
     day: 'numeric',
   });
 }
+
+export function calculateDiscount(price: number, discountPercent: number): number {
+  return price - (price * discountPercent / 100);
+}
+
+export function calculateTax(amount: number, taxRate: number): number {
+  return amount * taxRate / 100;
+}

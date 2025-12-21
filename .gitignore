@@ -48,3 +48,4 @@ prisma.config.ts
 FRONTEND_INTEGRATION_PLAN.md
 test-clip.ts
 insomnia_collection.json
+load-tests/
