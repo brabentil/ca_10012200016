@@ -135,36 +135,12 @@ export default function StyleMatchPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 flex items-center gap-3">
+              <h1 className="text-4xl md:text-5xl font-bold flex items-center gap-3">
                 <Sparkles className="w-10 h-10" />
                 AI Style Matcher
               </h1>
-              <p className="text-lg md:text-xl text-white/90 max-w-3xl">
-                Upload a photo of your favorite outfit or fashion item, and let our AI find similar styles from our collection.
-              </p>
             </motion.div>
           </div>
-        </section>
-
-        {/* Info Banner */}
-        <section className="max-w-screen-2xl mx-auto px-6 -mt-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3"
-          >
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-900">
-              <p className="font-semibold mb-1">How it works:</p>
-              <ul className="space-y-1 text-blue-800">
-                <li>• Upload a clear photo of clothing or fashion items</li>
-                <li>• Our AI analyzes style, color, patterns, and design elements</li>
-                <li>• Get products ranked by visual similarity</li>
-                <li>• Best results with well-lit, focused images (JPG/PNG, max 10MB)</li>
-              </ul>
-            </div>
-          </motion.div>
         </section>
 
         {/* Main Content */}
@@ -230,11 +206,8 @@ export default function StyleMatchPage() {
                       <Sparkles className="w-16 h-16 text-primary-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      Ready to Find Your Style
+                      Upload an image to start
                     </h3>
-                    <p className="text-gray-600 text-center max-w-md">
-                      Upload an image to get started. Our AI will instantly search through thousands of products to find your perfect matches.
-                    </p>
                   </div>
                 ) : (
                   // Results or Loading
@@ -248,44 +221,6 @@ export default function StyleMatchPage() {
             </div>
           </div>
         </section>
-
-        {/* Tips Section */}
-        {!hasSearched && !isSearching && (
-          <section className="max-w-screen-2xl mx-auto px-6 pb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="bg-white rounded-xl p-8 shadow-md border border-gray-200"
-            >
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Tips for Best Results
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold text-primary-600 mb-2">✓ Do This:</h4>
-                  <ul className="space-y-2 text-gray-700 text-sm">
-                    <li>• Use clear, well-lit photos</li>
-                    <li>• Focus on the main item</li>
-                    <li>• Show the full item if possible</li>
-                    <li>• Use images with good contrast</li>
-                    <li>• Try different angles for better results</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-orange-600 mb-2">✗ Avoid This:</h4>
-                  <ul className="space-y-2 text-gray-700 text-sm">
-                    <li>• Blurry or low-quality images</li>
-                    <li>• Multiple items in one photo</li>
-                    <li>• Dark or poorly lit photos</li>
-                    <li>• Extreme close-ups of patterns</li>
-                    <li>• Screenshots with UI elements</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          </section>
-        )}
       </div>
       <Footer />
     </>
