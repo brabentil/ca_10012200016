@@ -66,7 +66,7 @@ export default function WishlistItem({ item, onRemove }: WishlistItemProps) {
       // Update local cart store
       addItem({
         cart_item_id: data.data.id,
-        product_id: parseInt(item.productId),
+        product_id: item.productId,
         quantity: 1,
         product_name: item.product.title,
         price: item.product.price,
