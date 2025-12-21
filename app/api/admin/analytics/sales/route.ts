@@ -193,7 +193,7 @@ export async function GET(req: NextRequest) {
     const topProductsWithDetails = topProducts.map((item) => {
       const product = products.find((p) => p.id === item.productId);
       const quantity = item._sum.quantity || 0;
-      const priceAtPurchase = item._sum.priceAtPurchase || 0;
+      const priceAtPurchase = Number(item._sum.priceAtPurchase || 0);
       return {
         productId: item.productId,
         productTitle: product?.title || "Unknown",
