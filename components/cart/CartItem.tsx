@@ -238,15 +238,7 @@ export default function CartItem({ item }: CartItemProps) {
             </div>
           </div>
 
-          {/* Delivery Info */}
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <div className="flex items-start gap-2 text-xs text-gray-600">
-              <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-blue-600" />
-              <p>
-                <span className="font-medium text-gray-900">Campus Delivery:</span> Delivered within 24-48 hours to your dorm room
-              </p>
-            </div>
-          </div>
+
         </div>
       </motion.div>
     </AnimatePresence>

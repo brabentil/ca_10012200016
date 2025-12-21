@@ -11,6 +11,9 @@ import {
 } from '@/lib/response';
 import { format } from 'date-fns';
 
+// Ensure this route works with Node.js runtime
+export const runtime = 'nodejs';
+
 /**
  * Generate unique order number
  * Format: THB-{YYYYMMDD}-{randomString}
@@ -48,42 +51,77 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { deliveryAddress, campusZone, paymentMethod } = validation.data;
+    const { deliveryAddress, campusZone, paymentMethod, items: cartItems, deliveryFee } = validation.data;
 
-    // Find user's cart with items
-    const cart = await prisma.cart.findUnique({
-      where: { userId },
-      include: {
-        items: {
-          include: {
-            product: true,
+    // If items provided in request (from localStorage cart), use those
+    // Otherwise fallback to database cart
+    let orderItems: any[] = [];
+    
+    if (cartItems && cartItems.length > 0) {
+      // Fetch product details for provided items
+      const productIds = cartItems.map((item: any) => item.productId);
+      const products = await prisma.product.findMany({
+        where: { id: { in: productIds } },
+      });
+
+      // Map to order items format with validation
+      for (const cartItem of cartItems) {
+        const product = products.find(p => p.id === cartItem.productId);
+        if (!product) {
+          return conflictErrorResponse(`Product not found.`);
+        }
+        if (!product.isActive) {
+          return conflictErrorResponse(`Product "${product.title}" is no longer available.`);
+        }
+        if (product.stock < cartItem.quantity) {
+          return conflictErrorResponse(
+            `Insufficient stock for "${product.title}". Only ${product.stock} available.`
+          );
+        }
+        orderItems.push({
+          product,
+          quantity: cartItem.quantity,
+        });
+      }
+    } else {
+      // Fallback to database cart
+      const cart = await prisma.cart.findUnique({
+        where: { userId },
+        include: {
+          items: {
+            include: {
+              product: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!cart || cart.items.length === 0) {
-      return conflictErrorResponse('Cart is empty. Add items before creating an order.');
+      if (!cart || cart.items.length === 0) {
+        return conflictErrorResponse('Cart is empty. Add items before creating an order.');
+      }
+
+      // Validate stock availability for all items
+      for (const item of cart.items) {
+        if (!item.product.isActive) {
+          return conflictErrorResponse(
+            `Product "${item.product.title}" is no longer available.`
+          );
+        }
+        if (item.product.stock < item.quantity) {
+          return conflictErrorResponse(
+            `Insufficient stock for "${item.product.title}". Only ${item.product.stock} available.`
+          );
+        }
+      }
+      
+      orderItems = cart.items;
     }
 
-    // Validate stock availability for all items
-    for (const item of cart.items) {
-      if (!item.product.isActive) {
-        return conflictErrorResponse(
-          `Product "${item.product.title}" is no longer available.`
-        );
-      }
-      if (item.product.stock < item.quantity) {
-        return conflictErrorResponse(
-          `Insufficient stock for "${item.product.title}". Only ${item.product.stock} available.`
-        );
-      }
-    }
-
-    // Calculate total amount
-    const totalAmount = cart.items.reduce((total: number, item: any) => {
+    // Calculate total amount (subtotal + delivery fee)
+    const subtotal = orderItems.reduce((total: number, item: any) => {
       return total + Number(item.product.price) * item.quantity;
     }, 0);
+    const totalAmount = subtotal + (deliveryFee || 0);
 
     // Generate order number
     const orderNumber = generateOrderNumber();
@@ -103,12 +141,12 @@ export async function POST(request: NextRequest) {
       });
 
       // 2. Create OrderItems with priceAtPurchase snapshot
-      const orderItems = await Promise.all(
-        cart.items.map((item: any) =>
+      const createdOrderItems = await Promise.all(
+        orderItems.map((item: any) =>
           tx.orderItem.create({
             data: {
               orderId: newOrder.id,
-              productId: item.productId,
+              productId: item.product.id,
               quantity: item.quantity,
               priceAtPurchase: item.product.price,
             },
@@ -118,9 +156,9 @@ export async function POST(request: NextRequest) {
 
       // 3. Reduce product stock atomically
       await Promise.all(
-        cart.items.map((item: any) =>
+        orderItems.map((item: any) =>
           tx.product.update({
-            where: { id: item.productId },
+            where: { id: item.product.id },
             data: {
               stock: {
                 decrement: item.quantity,
@@ -130,23 +168,18 @@ export async function POST(request: NextRequest) {
         )
       );
 
-      // 4. Clear cart items
-      await tx.cartItem.deleteMany({
-        where: { cartId: cart.id },
+      // 4. Clear cart items (if cart exists in database)
+      const dbCart = await tx.cart.findUnique({
+        where: { userId },
       });
+      if (dbCart) {
+        await tx.cartItem.deleteMany({
+          where: { cartId: dbCart.id },
+        });
+      }
 
-      // 5. Create Payment record
-      await tx.payment.create({
-        data: {
-          orderId: newOrder.id,
-          amount: totalAmount,
-          method: paymentMethod,
-          status: 'PENDING',
-          installmentPlan: paymentMethod === 'INSTALLMENT',
-          paidAmount: 0,
-          remainingAmount: paymentMethod === 'INSTALLMENT' ? totalAmount : 0,
-        } as any,
-      });
+      // Note: Payment record will be created by payment initialization endpoint
+      // Don't create it here to avoid conflicts
 
       return newOrder;
     });
@@ -189,12 +222,12 @@ export async function POST(request: NextRequest) {
           image: item.product.images[0]?.imageUrl || null,
         },
       })),
-      payment: {
-        id: completeOrder!.payment!.id,
-        paymentMethod: completeOrder!.payment!.method,
-        paymentStatus: completeOrder!.payment!.status,
-        installmentPlan: completeOrder!.payment!.installmentPlan,
-      },
+      payment: completeOrder!.payment ? {
+        id: completeOrder!.payment.id,
+        paymentMethod: completeOrder!.payment.method,
+        paymentStatus: completeOrder!.payment.status,
+        installmentPlan: completeOrder!.payment.installmentPlan,
+      } : null,
       createdAt: completeOrder!.createdAt,
     };
 

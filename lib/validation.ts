@@ -104,6 +104,12 @@ export const createOrderSchema = z.object({
   deliveryAddress: z.string().min(1, 'Delivery address is required'),
   campusZone: z.string().min(1, 'Campus zone is required'),
   paymentMethod: z.enum(['CARD', 'MOBILE_MONEY', 'INSTALLMENT']),
+  deliveryFee: z.number().min(0).optional().default(0),
+  items: z.array(z.object({
+    productId: z.string(),
+    quantity: z.number().int().positive(),
+    price: z.number().positive(),
+  })).optional(),
 });
 
 /**

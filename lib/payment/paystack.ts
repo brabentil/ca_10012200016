@@ -103,12 +103,17 @@ export async function initializeTransaction(
   channels?: string[]
 ): Promise<PaystackInitializeResponse> {
   try {
+    // Get callback URL from environment or construct default
+    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    const callbackUrl = `${baseUrl}/payment/verify`;
+
     const response = await axios.post<PaystackInitializeResponse>(
       `${PAYSTACK_BASE_URL}/transaction/initialize`,
       {
         email,
         amount: Math.round(amount * 100), // Convert to kobo
         reference,
+        callback_url: callbackUrl,
         metadata,
         channels: channels || ['card', 'mobile_money'],
       },

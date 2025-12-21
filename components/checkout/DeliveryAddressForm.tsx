@@ -19,7 +19,7 @@ interface CampusZone {
 }
 
 interface DeliveryAddressFormProps {
-  onAddressChange: (address: DeliveryAddressData) => void;
+  onAddressChange: (address: DeliveryAddressData, zoneFee: number) => void;
   initialData?: DeliveryAddressData;
 }
 
@@ -117,7 +117,7 @@ export default function DeliveryAddressForm({
         roomNumber: roomNumber.trim(),
         additionalInfo: additionalInfo.trim() || undefined,
         deliveryAddress: fullAddress,
-      });
+      }, zone?.deliveryFee || 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedZone, dormName, roomNumber, additionalInfo, zones]);

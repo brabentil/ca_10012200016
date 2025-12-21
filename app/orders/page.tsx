@@ -57,14 +57,6 @@ export default function OrdersPage() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      if (!token) {
-        toast.error('Please login to view your orders');
-        router.push('/login');
-        return;
-      }
-
       // Build query params
       const params = new URLSearchParams({
         page: page.toString(),
@@ -76,14 +68,11 @@ export default function OrdersPage() {
       }
 
       const response = await fetch(`/api/orders?${params.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (response.status === 401) {
         toast.error('Session expired. Please login again');
-        localStorage.removeItem('accessToken');
         router.push('/login');
         return;
       }

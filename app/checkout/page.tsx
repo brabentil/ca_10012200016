@@ -91,18 +91,9 @@ export default function CheckoutPage() {
   };
 
   // Handle address change
-  const handleAddressChange = (address: DeliveryAddressData) => {
+  const handleAddressChange = (address: DeliveryAddressData, zoneFee: number) => {
     setDeliveryAddress(address);
-    
-    // Update delivery fee based on zone
-    const zoneFees: Record<string, number> = {
-      'ZONE_A': 0,
-      'ZONE_B': 5,
-      'ZONE_C': 5,
-      'ZONE_D': 8,
-      'ZONE_E': 8,
-    };
-    setDeliveryFee(zoneFees[address.campusZone] || 0);
+    setDeliveryFee(zoneFee);
   };
 
   // Handle payment method change
@@ -123,7 +114,13 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
+      // Debug: Check if cookies are being sent
+      console.log('[Checkout] About to create order');
+      console.log('[Checkout] Document cookies:', document.cookie);
+      console.log('[Checkout] Cart items:', items.length);
+      
       // Create order (uses httpOnly cookies for auth)
+      // Send cart items directly since cart only exists in localStorage
       const orderResponse = await fetch('/api/orders', {
         method: 'POST',
         headers: {
@@ -134,6 +131,12 @@ export default function CheckoutPage() {
           deliveryAddress: deliveryAddress.deliveryAddress,
           campusZone: deliveryAddress.campusZone,
           paymentMethod,
+          deliveryFee: deliveryFee,
+          items: items.map(item => ({
+            productId: item.product_id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
         }),
       });
 
@@ -167,9 +170,6 @@ export default function CheckoutPage() {
 
         const paymentData = await paymentResponse.json();
         
-        // Clear cart
-        clearCart();
-        
         // Redirect to Paystack
         if (paymentData.data.authorizationUrl) {
           window.location.href = paymentData.data.authorizationUrl;
@@ -195,9 +195,6 @@ export default function CheckoutPage() {
         }
 
         const paymentData = await paymentResponse.json();
-        
-        // Clear cart
-        clearCart();
         
         // Redirect to Paystack
         if (paymentData.data.authorizationUrl) {

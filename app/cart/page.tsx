@@ -25,20 +25,9 @@ export default function CartPage() {
     setIsClearing(true);
 
     try {
-      // API call to clear cart on server (uses httpOnly cookies for auth)
-      const response = await fetch('/api/cart/clear', {
-        method: 'DELETE',
-        credentials: 'include', // Include cookies
-      });
-
-      if (response.ok) {
-        // Clear local cart store
-        clearCart();
-        toast.success('Cart cleared successfully');
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.error?.message || 'Failed to clear cart');
-      }
+      // Clear local cart store (cart only exists in localStorage)
+      clearCart();
+      toast.success('Cart cleared successfully');
     } catch (error) {
       console.error('Error clearing cart:', error);
       toast.error('Failed to clear cart');
@@ -139,25 +128,7 @@ export default function CartPage() {
             </motion.div>
 
             {/* Delivery Information */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4"
-            >
-              <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-blue-900 text-sm mb-1">
-                    Fast Campus Delivery
-                  </h3>
-                  <p className="text-xs text-blue-700 leading-relaxed">
-                    All items will be delivered to your dorm room within 24-48 hours. 
-                    Free delivery on orders over ₵100.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+
 
             {/* Security Notice */}
             <motion.div

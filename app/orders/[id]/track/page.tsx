@@ -74,23 +74,12 @@ export default function TrackDeliveryPage() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      if (!token) {
-        toast.error('Please login to track your delivery');
-        router.push('/login');
-        return;
-      }
-
       const response = await fetch(`/api/deliveries/track/${orderId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (response.status === 401) {
         toast.error('Session expired. Please login again');
-        localStorage.removeItem('accessToken');
         router.push('/login');
         return;
       }

@@ -69,17 +69,8 @@ export default function PaydayFlexDetailsPage() {
   const fetchPaymentDetails = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        toast.error('Please login to view payment details');
-        router.push('/login');
-        return;
-      }
-
       const response = await apiClient.get(`/payments/${orderId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        withCredentials: true,
       });
 
       if (response.data.success) {
@@ -117,13 +108,6 @@ export default function PaydayFlexDetailsPage() {
 
     setIsProcessingPayment(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        toast.error('Please login to make payment');
-        router.push('/login');
-        return;
-      }
-
       // Redirect to payment for second installment
       toast.info('Redirecting to payment...');
       

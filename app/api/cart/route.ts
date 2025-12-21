@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { successResponse, errorResponse, notFoundErrorResponse } from '@/lib/response';
 
+// Ensure this route works with Edge Runtime
+export const runtime = 'nodejs';
+
 /**
  * GET /api/cart
  * Get user's shopping cart with all items and product details
