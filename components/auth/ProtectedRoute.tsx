@@ -24,7 +24,7 @@ export default function ProtectedRoute({
     }
 
     // Redirect to verification if student verification is required but not completed
-    if (requireVerified && !user.isVerified) {
+    if (requireVerified && user.verification?.status !== 'VERIFIED') {
       router.push(`/verify?email=${user.email}`);
       return;
     }
@@ -36,7 +36,7 @@ export default function ProtectedRoute({
   }
 
   // Show nothing if verification is required but not completed
-  if (requireVerified && !user.isVerified) {
+  if (requireVerified && user.verification?.status !== 'VERIFIED') {
     return null;
   }
 
